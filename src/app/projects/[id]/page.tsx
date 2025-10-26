@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import React from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,7 +30,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, GripVertical, Calendar as CalendarIcon } from "lucide-react";
+import { MoreHorizontal, GripVertical, Calendar as CalendarIcon, ChevronUp, Equal, ChevronDown, ListTodo, Signal, User, Filter, ArrowUpDown, ArrowUp, ArrowDown, Folder, ArrowLeft, Plus } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
@@ -45,6 +45,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Dnd-kit imports
 import {
@@ -66,6 +67,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { motion } from "framer-motion";
 
 interface Project {
   id: string;
@@ -89,38 +91,39 @@ interface Task {
 
 // Component for the circular countdown timer
 const CircularTimer = ({ createdAt, dueDate }: { createdAt: string; dueDate: string | null }) => {
-  if (!dueDate) return null;
-
-  const SIZE = 24;
-  const STROKE_WIDTH = 3;
-  const radius = (SIZE - STROKE_WIDTH) / 2;
-  const circumference = 2 * Math.PI * radius;
+  const startDate = useMemo(() => new Date(createdAt), [createdAt]);
+  const endDate = useMemo(() => (dueDate ? new Date(dueDate) : null), [dueDate]);
 
   const [progress, setProgress] = useState(0);
   const [color, setColor] = useState("stroke-green-500");
 
   useEffect(() => {
+    if (!endDate || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      // Don't run the effect if dates are invalid or not present
+      return;
+    }
+
     const calculateProgress = () => {
       const now = new Date().getTime();
-      const start = new Date(createdAt).getTime();
-      const end = new Date(dueDate).getTime();
+      const start = startDate.getTime();
+      const end = endDate.getTime();
 
       if (now >= end) {
-        return { percentage: 0, newColor: 'stroke-red-500' }; // 0% time remaining
+        return { percentage: 0, newColor: 'stroke-red-500' };
       }
       if (start >= end) {
-        return { percentage: 0, newColor: 'stroke-red-500' }; // Invalid duration
+        return { percentage: 0, newColor: 'stroke-red-500' };
       }
 
       const totalDuration = end - start;
       const remainingTime = end - now;
       const percentage = Math.max(0, (remainingTime / totalDuration) * 100);
 
-      let newColor = "stroke-green-500";
+      let newColor = "stroke-green-500 dark:stroke-green-400";
       if (percentage <= 10) {
-        newColor = "stroke-red-500";
+        newColor = "stroke-red-500 dark:stroke-red-400";
       } else if (percentage <= 25) {
-        newColor = "stroke-yellow-500";
+        newColor = "stroke-yellow-500 dark:stroke-yellow-400";
       }
       
       return { percentage, newColor };
@@ -133,10 +136,19 @@ const CircularTimer = ({ createdAt, dueDate }: { createdAt: string; dueDate: str
     };
 
     updateState();
-    const interval = setInterval(updateState, 60000); // Update every minute
+    const interval = setInterval(updateState, 60000);
 
     return () => clearInterval(interval);
-  }, [createdAt, dueDate]);
+  }, [startDate, endDate]);
+
+  if (!dueDate || !endDate || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+    return null;
+  }
+
+  const SIZE = 24;
+  const STROKE_WIDTH = 3;
+  const radius = (SIZE - STROKE_WIDTH) / 2;
+  const circumference = 2 * Math.PI * radius;
 
   const offset = circumference - (progress / 100) * circumference;
 
@@ -202,9 +214,9 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
 
   const getTranslatedStatus = (status: string) => {
     switch (status) {
-      case "TODO": return "À faire";
-      case "IN_PROGRESS": return "En cours";
-      case "DONE": return "Terminé";
+      case "todo": return "À faire";
+      case "inprogress": return "En cours";
+      case "done": return "Terminé";
       default: return status;
     }
   };
@@ -284,25 +296,29 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
           
           <div className="flex items-center justify-between text-xs mt-3">
             <div className="flex flex-wrap gap-1">
-              <Badge variant="outline" className={getPriorityClasses(task.priority)}>{getTranslatedPriority(task.priority)}</Badge>
+                            <Badge variant="outline" className={cn("flex items-center gap-1", getPriorityClasses(task.priority))}>
+                {task.priority === 'HIGH' && <ChevronUp className="h-3 w-3" />}
+                {task.priority === 'MEDIUM' && <Equal className="h-3 w-3" />}
+                {task.priority === 'LOW' && <ChevronDown className="h-3 w-3" />}
+                {getTranslatedPriority(task.priority)}
+              </Badge>
               {task.assignee && (
                 <Badge variant="outline" className="flex items-center gap-1">
                   {task.assignee.name}
                 </Badge>
               )}
-              {task.dueDate && (
-                <Badge
-                  variant="outline"
-                  className={cn(
-                    "flex items-center gap-1",
-                    new Date(task.dueDate) < new Date() && task.status !== 'done' && "bg-red-100 text-red-800 border-red-200"
-                  )}
-                >
-                  <CalendarIcon className="h-3 w-3" />
-                  {format(new Date(task.dueDate), "d MMM, HH:mm", { locale: fr })}
-                </Badge>
-              )}
-            </div>
+                          {task.dueDate && !isNaN(new Date(task.dueDate).getTime()) && (
+                            <Badge
+                              variant="outline"
+                              className={cn(
+                                "flex items-center gap-1",
+                                new Date(task.dueDate) < new Date() && task.status !== 'done' && "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/50 dark:text-red-300 dark:border-red-800"
+                              )}
+                            >
+                              <CalendarIcon className="h-3 w-3" />
+                              {format(new Date(task.dueDate), "d MMM, HH:mm", { locale: fr })}
+                            </Badge>
+                          )}            </div>
             {/* {task.status === 'inprogress' && (
               <Checkbox
                 onCheckedChange={() => onMarkAsDone(task.id)}
@@ -325,6 +341,58 @@ function DroppableColumn({ id, title, children }: { id: string; title: string; c
       <h3 className="text-lg font-semibold mb-4">{title}</h3>
       <div className="min-h-[100px]"> {/* Ensure droppable area has height */}
         {children}
+      </div>
+    </div>
+  );
+}
+
+function ProjectPageSkeleton() {
+  return (
+    <div className="min-h-screen p-8">
+      {/* Header skeleton */}
+      <div className="flex justify-between items-center mb-8">
+        <Skeleton className="h-10 w-1/3" />
+        <Skeleton className="h-10 w-48" />
+      </div>
+      <Skeleton className="h-6 w-2/3 mb-8" />
+
+      {/* Controls skeleton */}
+      <div className="flex justify-between items-center mb-4">
+        <Skeleton className="h-8 w-32" />
+        <Skeleton className="h-10 w-48" />
+      </div>
+      <div className="flex flex-wrap items-center gap-4 mb-4">
+        <Skeleton className="h-10 w-44" />
+        <Skeleton className="h-10 w-44" />
+        <Skeleton className="h-10 w-44" />
+      </div>
+
+      {/* Kanban skeleton */}
+      <div className="flex gap-4 overflow-x-auto pb-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="flex-1 min-w-[280px] max-w-[350px] bg-muted/40 p-4 rounded-lg shadow-sm">
+            <Skeleton className="h-6 w-1/2 mb-4" />
+            <div className="grid gap-4">
+              <Card>
+                <CardHeader>
+                  <Skeleton className="h-5 w-3/4" />
+                </CardHeader>
+                <CardContent className="grid gap-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-2/3" />
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <Skeleton className="h-5 w-1/2" />
+                </CardHeader>
+                <CardContent className="grid gap-2">
+                  <Skeleton className="h-4 w-full" />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -545,7 +613,7 @@ export default function ProjectDetailsPage({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ status: 'DONE' }),
+      body: JSON.stringify({ status: 'done' }),
     });
 
     if (res.ok) {
@@ -660,6 +728,21 @@ export default function ProjectDetailsPage({
     }
   };
 
+  const columnsContainerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const columnVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   const onDragStart = (event: any) => {
     setActiveId(event.active.id);
   };
@@ -673,18 +756,17 @@ export default function ProjectDetailsPage({
   const activeTask = activeId ? tasks.find((task) => task.id === activeId) : null;
 
   if (status === "loading" || !project) {
-    return <p>Chargement des détails du projet...</p>;
-  }
-
-  if (!session) {
-    return null; // Should redirect to sign-in
+    return <ProjectPageSkeleton />;
   }
 
   return (
     <div className="min-h-screen p-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold">{project.name}</h1>
-        <Button onClick={() => router.push("/dashboard")}>Retour au tableau de bord</Button>
+                <h1 className="text-4xl font-bold flex items-center">
+          <Folder className="mr-4 h-8 w-8" />
+          {project.name}
+        </h1>
+                <Button onClick={() => router.push("/dashboard")}><ArrowLeft className="mr-2 h-4 w-4" />Retour au tableau de bord</Button>
       </div>
 
       <p className="text-lg text-muted-foreground mb-8">{project.description || "Aucune description fournie."}</p>
@@ -693,7 +775,7 @@ export default function ProjectDetailsPage({
         <h2 className="text-2xl font-semibold">Tâches</h2>
         <Dialog open={isCreateTaskDialogOpen} onOpenChange={setIsCreateTaskDialogOpen}>
           <DialogTrigger asChild>
-            <Button>Créer une nouvelle tâche</Button>
+                        <Button><Plus className="mr-2 h-4 w-4" />Créer une nouvelle tâche</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -724,6 +806,7 @@ export default function ProjectDetailsPage({
                 <Label htmlFor="taskStatus">Statut</Label>
                 <Select value={newTaskStatus} onValueChange={setNewTaskStatus}>
                   <SelectTrigger id="taskStatus">
+                    <ListTodo className="mr-2 h-4 w-4" />
                     <SelectValue placeholder="Sélectionner le statut" />
                   </SelectTrigger>
                   <SelectContent>
@@ -737,6 +820,7 @@ export default function ProjectDetailsPage({
                 <Label htmlFor="taskPriority">Priorité</Label>
                 <Select value={newTaskPriority} onValueChange={setNewTaskPriority}>
                   <SelectTrigger id="taskPriority">
+                    <Signal className="mr-2 h-4 w-4" />
                     <SelectValue placeholder="Sélectionner la priorité" />
                   </SelectTrigger>
                   <SelectContent>
@@ -750,6 +834,7 @@ export default function ProjectDetailsPage({
                 <Label htmlFor="taskAssignee">Assigner à</Label>
                 <Select onValueChange={setNewTaskAssigneeId} defaultValue={newTaskAssigneeId || undefined}>
                   <SelectTrigger id="taskAssignee">
+                    <User className="mr-2 h-4 w-4" />
                     <SelectValue placeholder="Non assigné" />
                   </SelectTrigger>
                   <SelectContent>
@@ -802,6 +887,7 @@ export default function ProjectDetailsPage({
           <Label htmlFor="filterStatus">Statut:</Label>
           <Select value={filterStatus} onValueChange={setFilterStatus}>
             <SelectTrigger id="filterStatus" className="w-[180px]">
+              <Filter className="mr-2 h-4 w-4" />
               <SelectValue placeholder="Filtrer par statut" />
             </SelectTrigger>
             <SelectContent>
@@ -817,6 +903,7 @@ export default function ProjectDetailsPage({
           <Label htmlFor="filterPriority">Priorité:</Label>
           <Select value={filterPriority} onValueChange={setFilterPriority}>
             <SelectTrigger id="filterPriority" className="w-[180px]">
+              <Signal className="mr-2 h-4 w-4" />
               <SelectValue placeholder="Filtrer par priorité" />
             </SelectTrigger>
             <SelectContent>
@@ -834,6 +921,7 @@ export default function ProjectDetailsPage({
           <Label htmlFor="sortBy">Trier par:</Label>
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger id="sortBy" className="w-[180px]">
+              <ArrowUpDown className="mr-2 h-4 w-4" />
               <SelectValue placeholder="Trier par" />
             </SelectTrigger>
             <SelectContent>
@@ -848,7 +936,7 @@ export default function ProjectDetailsPage({
             size="icon"
             onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
           >
-            {sortOrder === "asc" ? "↑" : "↓"}
+            {sortOrder === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
           </Button>
         </div>
       </div>
@@ -859,29 +947,45 @@ export default function ProjectDetailsPage({
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
       >
-        <div className="flex gap-4 overflow-x-auto pb-4">
+        <motion.div
+          className="flex gap-4 overflow-x-auto pb-4"
+          variants={columnsContainerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           {["todo", "inprogress", "done"].map((statusColumn) => (
-            <DroppableColumn key={statusColumn} id={statusColumn} title={getTranslatedStatus(statusColumn)}>
-              <SortableContext items={tasksByStatus[statusColumn].map(task => task.id)} strategy={verticalListSortingStrategy}>
-                {tasksByStatus[statusColumn].length === 0 ? (
-                  <p className="text-muted-foreground text-sm p-2">Aucune tâche dans cette colonne.</p>
-                ) : (
-                  tasksByStatus[statusColumn].map((task) => (
-                    <SortableTask
-                      key={task.id}
-                      task={task}
-                      tenantUsers={tenantUsers}
-                      onEdit={handleOpenEditDialog}
-                      onDelete={handleDeleteTask}
-                      onMarkAsDone={handleMarkAsDone}
-                      onAssign={handleAssignTask}
-                    />
-                  ))
-                )}
-              </SortableContext>
-            </DroppableColumn>
+            <motion.div key={statusColumn} variants={columnVariants}>
+              <DroppableColumn id={statusColumn} title={getTranslatedStatus(statusColumn)}>
+                <SortableContext items={tasksByStatus[statusColumn].map(task => task.id)} strategy={verticalListSortingStrategy}>
+                  {tasksByStatus[statusColumn].length === 0 ? (
+                    <div className="text-center text-muted-foreground text-sm p-4">
+                      <Image
+                        src="/file.svg"
+                        alt="No tasks"
+                        width={64}
+                        height={64}
+                        className="mx-auto mb-2 opacity-50"
+                      />
+                      <p>Aucune tâche ici.</p>
+                    </div>
+                  ) : (
+                    tasksByStatus[statusColumn].map((task) => (
+                      <SortableTask
+                        key={task.id}
+                        task={task}
+                        tenantUsers={tenantUsers}
+                        onEdit={handleOpenEditDialog}
+                        onDelete={handleDeleteTask}
+                        onMarkAsDone={handleMarkAsDone}
+                        onAssign={handleAssignTask}
+                      />
+                    ))
+                  )}
+                </SortableContext>
+              </DroppableColumn>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
         <DragOverlay>
           {activeTask ? (
             <SortableTask
@@ -927,25 +1031,25 @@ export default function ProjectDetailsPage({
                 }
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="editTaskStatus">Statut</Label>
-              <Select
-                value={editingTask?.status || "todo"}
-                onValueChange={(value) =>
-                  setEditingTask((prev) => (prev ? { ...prev, status: value } : null))
-                }
-              >
-                <SelectTrigger id="editTaskStatus">
-                  <SelectValue placeholder="Sélectionner le statut" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todo">À faire</SelectItem>
-                  <SelectItem value="inprogress">En cours</SelectItem>
-                  <SelectItem value="done">Terminé</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
                           <div className="grid gap-2">
+                            <Label htmlFor="editTaskStatus">Statut</Label>
+                            <Select
+                              value={editingTask?.status || "todo"}
+                              onValueChange={(value) =>
+                                setEditingTask((prev) => (prev ? { ...prev, status: value } : null))
+                              }
+                            >
+                              <SelectTrigger id="editTaskStatus">
+                                <ListTodo className="mr-2 h-4 w-4" />
+                                <SelectValue placeholder="Sélectionner le statut" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="todo">À faire</SelectItem>
+                                <SelectItem value="inprogress">En cours</SelectItem>
+                                <SelectItem value="done">Terminé</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>                          <div className="grid gap-2">
                             <Label htmlFor="editTaskPriority">Priorité</Label>
                             <Select
                               value={editingTask?.priority || "MEDIUM"}
@@ -954,6 +1058,7 @@ export default function ProjectDetailsPage({
                               }
                             >
                               <SelectTrigger id="editTaskPriority">
+                                <Signal className="mr-2 h-4 w-4" />
                                 <SelectValue placeholder="Sélectionner la priorité" />
                               </SelectTrigger>
                               <SelectContent>
@@ -961,8 +1066,8 @@ export default function ProjectDetailsPage({
                                 <SelectItem value="MEDIUM">Moyenne</SelectItem>
                                 <SelectItem value="HIGH">Haute</SelectItem>
                               </SelectContent>
-                                            </Select>
-                                          </div>
+                            </Select>
+                          </div>
                                           <div className="grid gap-2">
                                             <Label htmlFor="editTaskAssignee">Assigner à</Label>
                                             <Select
@@ -972,6 +1077,7 @@ export default function ProjectDetailsPage({
                                               }
                                             >
                                               <SelectTrigger id="editTaskAssignee">
+                                                <User className="mr-2 h-4 w-4" />
                                                 <SelectValue placeholder="Non assigné" />
                                               </SelectTrigger>
                                               <SelectContent>
@@ -995,37 +1101,38 @@ export default function ProjectDetailsPage({
                                                                           !editingTask?.dueDate && "text-muted-foreground"
                                                                         )}
                                                                       >
-                                                                                              <CalendarIcon className="mr-2 h-4 w-4" />
-                                                                                              {editingTask?.dueDate ? format(new Date(editingTask.dueDate), "PPP p", { locale: fr }) : <span>Choisir une date</span>}                                                                      </Button>
-                                                                    </PopoverTrigger>
-                                                                    <PopoverContent className="w-auto p-0">
-                                                                      <Calendar
-                                                                        mode="single"
-                                                                        selected={editingTask?.dueDate ? new Date(editingTask.dueDate) : undefined}
-                                                                        onSelect={(day) => {
-                                                                          const newDate = editingTask?.dueDate ? new Date(editingTask.dueDate) : new Date();
-                                                                          if (day) {
-                                                                            newDate.setFullYear(day.getFullYear(), day.getMonth(), day.getDate());
-                                                                            setEditingTask((prev) => (prev ? { ...prev, dueDate: newDate.toISOString() } : null));
-                                                                          }
-                                                                        }}
-                                                                        initialFocus
-                                                                      />
-                                                                      <div className="p-3 border-t border-border">
-                                                                        <input 
-                                                                          type="time"
-                                                                          className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
-                                                                          value={editingTask?.dueDate ? format(new Date(editingTask.dueDate), 'HH:mm') : ''}
-                                                                          onChange={(e) => {
-                                                                            const newDate = editingTask?.dueDate ? new Date(editingTask.dueDate) : new Date();
-                                                                            const [hours, minutes] = e.target.value.split(':').map(Number);
-                                                                            if (!isNaN(hours) && !isNaN(minutes)) {
-                                                                              newDate.setHours(hours, minutes, 0, 0);
-                                                                              setEditingTask((prev) => (prev ? { ...prev, dueDate: newDate.toISOString() } : null));
-                                                                            }
-                                                                          }}
-                                                                        />
-                                                                      </div>                                              </PopoverContent>
+                                                                                                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                                                                                                    {editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? format(new Date(editingTask.dueDate), "PPP p", { locale: fr }) : <span>Choisir une date</span>}
+                                                                                                                  </Button>
+                                                                                                                </PopoverTrigger>
+                                                                                                                <PopoverContent className="w-auto p-0">
+                                                                                                                  <Calendar
+                                                                                                                    mode="single"
+                                                                                                                    selected={editingTask?.dueDate ? new Date(editingTask.dueDate) : undefined}
+                                                                                                                    onSelect={(day) => {
+                                                                                                                      const newDate = editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? new Date(editingTask.dueDate) : new Date();
+                                                                                                                      if (day) {
+                                                                                                                        newDate.setFullYear(day.getFullYear(), day.getMonth(), day.getDate());
+                                                                                                                        setEditingTask((prev) => (prev ? { ...prev, dueDate: newDate.toISOString() } : null));
+                                                                                                                      }
+                                                                                                                    }}
+                                                                                                                    initialFocus
+                                                                                                                  />
+                                                                                                                  <div className="p-3 border-t border-border">
+                                                                                                                    <input 
+                                                                                                                      type="time"
+                                                                                                                      className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+                                                                                                                      value={editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? format(new Date(editingTask.dueDate), 'HH:mm') : ''}
+                                                                                                                      onChange={(e) => {
+                                                                                                                        const newDate = editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? new Date(editingTask.dueDate) : new Date();
+                                                                                                                        const [hours, minutes] = e.target.value.split(':').map(Number);
+                                                                                                                        if (!isNaN(hours) && !isNaN(minutes)) {
+                                                                                                                          newDate.setHours(hours, minutes, 0, 0);
+                                                                                                                          setEditingTask((prev) => (prev ? { ...prev, dueDate: newDate.toISOString() } : null));
+                                                                                                                        }
+                                                                                                                      }}
+                                                                                                                    />
+                                                                                                                  </div>                                              </PopoverContent>
                                             </Popover>
                                           </div>            <Button type="submit">Enregistrer les modifications</Button>
           </form>

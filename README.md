@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SaasK - Application de Gestion de Tâches
 
-## Getting Started
+Une application web collaborative de gestion de tâches et de projets, conçue pour être performante, intuitive et agréable à utiliser. Ce projet a été développé avec Next.js, Prisma, et Shadcn/UI.
 
-First, run the development server:
+## Démo Live
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+> **Note:** Le lien vers la démo sera ajouté ici une fois le projet déployé.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Fonctionnalités
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+-   **Authentification Complète :** Inscription et connexion sécurisées avec des identifiants (email/mot de passe).
+-   **Gestion de Projets :** Créez, consultez et organisez vos projets.
+-   **Tableau Kanban de Tâches :**
+    -   Créez, modifiez et supprimez des tâches.
+    -   Organisez les tâches par statut (À faire, En cours, Terminé) avec un système de glisser-déposer.
+    -   Assignez des priorités, des dates d'échéance et des responsables pour chaque tâche.
+-   **Gestion d'Utilisateurs (pour les Admins) :** Invitez, supprimez et gérez les rôles des utilisateurs au sein de votre organisation.
+-   **Profil Utilisateur :** Mettez à jour vos informations de profil et changez votre mot de passe.
+-   **Interface Moderne et Adaptative :**
+    -   Design épuré et professionnel grâce à **Shadcn/UI**.
+    -   Expérience utilisateur soignée avec des animations subtiles, des icônes et des écrans de chargement "squelette".
+    -   **Mode Sombre (Dark Mode)** avec possibilité de basculer entre les thèmes.
+    -   Interface entièrement adaptative pour une utilisation sur mobile et tablette.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Stack Technique
 
-## Learn More
+-   **Framework Frontend :** [Next.js](https://nextjs.org/) (App Router)
+-   **Base de Données :** [PostgreSQL](https://www.postgresql.org/)
+-   **ORM :** [Prisma](https://www.prisma.io/)
+-   **Authentification :** [NextAuth.js](https://next-auth.js.org/)
+-   **UI :** [Shadcn/UI](https://ui.shadcn.com/) & [Tailwind CSS](https://tailwindcss.com/)
+-   **Animations :** [Framer Motion](https://www.framer.com/motion/)
+-   **Notifications :** `sonner`
 
-To learn more about Next.js, take a look at the following resources:
+## Lancer le projet en local
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Pour faire tourner ce projet sur votre machine, suivez les étapes ci-dessous.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Prérequis
 
-## Deploy on Vercel
+-   [Node.js](https://nodejs.org/en/) (version 18 ou supérieure)
+-   [npm](https://www.npmjs.com/)
+-   Une instance de [PostgreSQL](https://www.postgresql.org/) en cours d'exécution.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Installation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1.  **Clonez le dépôt :**
+    ```bash
+    git clone <URL_DU_DEPOT>
+    cd <NOM_DU_DOSSIER>
+    ```
+
+2.  **Installez les dépendances :**
+    ```bash
+    npm install
+    ```
+
+3.  **Configurez les variables d'environnement :**
+    -   Créez un fichier `.env` à la racine du projet.
+    -   Ajoutez votre chaîne de connexion à la base de données :
+        ```
+        DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
+        ```
+    -   Ajoutez une clé secrète pour NextAuth.js :
+        ```
+        NEXTAUTH_SECRET="votre_super_secret"
+        ```
+
+4.  **Appliquez les migrations de la base de données :**
+    ```bash
+    npx prisma migrate dev
+    ```
+
+5.  **Lancez le serveur de développement :**
+    ```bash
+    npm run dev
+    ```
+
+Ouvrez [http://localhost:3000](http://localhost:3000) dans votre navigateur pour voir l'application.

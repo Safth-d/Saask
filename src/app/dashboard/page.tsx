@@ -17,12 +17,44 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import Link from "next/link";
+import Image from "next/image";
+import { Plus, Folder, Calendar } from "lucide-react"; // Added for the button icon
+import { motion } from "framer-motion";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
 
 interface Project {
   id: string;
   name: string;
   description: string | null;
   createdAt: string;
+  totalTasks: number;
+  completedTasks: number;
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {[...Array(3)].map((_, i) => (
+        <Card key={i}>
+          <CardHeader>
+            <Skeleton className="h-6 w-3/4" />
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <Skeleton className="h-4 w-full" />
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <Skeleton className="h-4 w-1/4" />
+                <Skeleton className="h-4 w-1/4" />
+              </div>
+              <Skeleton className="h-2 w-full" />
+            </div>
+            <Skeleton className="h-4 w-1/2" />
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
 }
 
 export default function DashboardPage() {
@@ -78,32 +110,44 @@ export default function DashboardPage() {
   };
 
   if (status === "loading") {
-    return <p>Loading...</p>;
+    return (
+      <div className="min-h-screen p-8">
+        <div className="flex justify-between items-center mb-4 mt-8">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-10 w-40" />
+        </div>
+        <DashboardSkeleton />
+      </div>
+    );
   }
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+    },
+  };
 
   if (session) {
     return (
       <div className="min-h-screen p-8">
-              <div className="flex justify-between items-center mb-8">
-                <h1 className="text-4xl font-bold">
-                  Bienvenue sur votre tableau de bord, {session.user?.name || session.user?.email}!
-                </h1>
-                <Button onClick={() => signOut()} variant="destructive">
-                  Se déconnecter
-                </Button>
-              </div>
-        
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center mb-4 mt-8">
                 <h2 className="text-2xl font-semibold">Vos Projets</h2>
                 <div className="flex gap-2">
-                  {session.user?.role === "ADMIN" && (
-                    <Button asChild>
-                      <Link href="/dashboard/users">Gérer les utilisateurs</Link>
-                    </Button>
-                  )}
                   <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button>Créer un nouveau projet</Button>
+                      <Button><Plus className="mr-2 h-4 w-4" />Créer un nouveau projet</Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
@@ -127,7 +171,7 @@ export default function DashboardPage() {
                           <Input
                             id="projectDescription"
                             value={newProjectDescription}
-                            onChange={(e) => setNewProjectName(e.target.value)}
+                            onChange={(e) => setNewProjectDescription(e.target.value)}
                           />
                         </div>
                         <Button type="submit">Créer le projet</Button>
@@ -136,28 +180,60 @@ export default function DashboardPage() {
                   </Dialog>
                 </div>
               </div>
-        
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+              <motion.div
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
                 {projects.length === 0 ? (
-                  <p>Aucun projet trouvé. Créez-en un pour commencer !</p>
+                  <div className="text-center col-span-3">
+                    <Image
+                      src="/file.svg"
+                      alt="No projects"
+                      width={128}
+                      height={128}
+                      className="mx-auto"
+                    />
+                    <p className="mt-4">Aucun projet trouvé. Créez-en un pour commencer !</p>
+                  </div>
                 ) : (
                   projects.map((project) => (
-                    <Card key={project.id}>
-                      <CardHeader>
-                        <CardTitle>
-                          <Link href={`/projects/${project.id}`}>{project.name}</Link>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p>{project.description || "Pas de description"}</p>
-                        <p className="text-sm text-muted-foreground mt-2">
-                          Créé le : {new Date(project.createdAt).toLocaleDateString()}
-                        </p>
-                      </CardContent>
-                    </Card>
+                    <motion.div key={project.id} variants={itemVariants}>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="flex items-center">
+                            <Folder className="mr-2 h-5 w-5" />
+                            <Link href={`/projects/${project.id}`}>{project.name}</Link>
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground">{project.description || "Pas de description"}</p>
+                          {project.totalTasks > 0 && (
+                            <div className="mt-4">
+                              <div className="flex justify-between items-center text-sm text-muted-foreground mb-1">
+                                <span>Tâches</span>
+                                <span>{project.completedTasks} / {project.totalTasks}</span>
+                              </div>
+                              <Progress value={(project.completedTasks / project.totalTasks) * 100} />
+                            </div>
+                          )}
+                          <p className="text-sm text-muted-foreground mt-4 flex items-center">
+                            <Calendar className="mr-2 h-4 w-4" />
+                            Créé le : {
+                              !isNaN(new Date(project.createdAt).getTime())
+                                ? new Date(project.createdAt).toLocaleDateString()
+                                : 'Date invalide'
+                            }
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
                   ))
                 )}
-              </div>      </div>
+              </motion.div>
+            </div>
     );
   }
 

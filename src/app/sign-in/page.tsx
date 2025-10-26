@@ -6,6 +6,10 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Mail, Lock, LogIn } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import GithubLogo from "@/components/icons/github";
+import GoogleLogo from "@/components/icons/google";
 import Link from "next/link";
 import { toast } from "sonner";
 
@@ -38,54 +42,85 @@ export default function SignInPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="mx-auto grid w-[350px] gap-6">
-        <div className="grid gap-2 text-center">
-          <h1 className="text-3xl font-bold">Se connecter</h1>
-          <p className="text-balance text-muted-foreground">
+      <Card className="mx-auto w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl font-bold">Se connecter</CardTitle>
+          <CardDescription>
             Entrez votre email ci-dessous pour vous connecter à votre compte
-          </p>
-        </div>
-        <form onSubmit={handleSubmit} className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label htmlFor="password">Mot de passe</Label>
-              <Link
-                href="/forgot-password"
-                className="ml-auto inline-block text-sm underline"
-              >
-                Mot de passe oublié ?
-              </Link>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
             </div>
-            <Input
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password">Mot de passe</Label>
+                <Link
+                  href="/forgot-password"
+                  className="ml-auto inline-block text-sm underline"
+                >
+                  Mot de passe oublié ?
+                </Link>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <Button type="submit" className="w-full">
+              <LogIn className="mr-2 h-4 w-4" />
+              Se connecter
+            </Button>
+          </form>
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Ou continuer avec
+              </span>
+            </div>
           </div>
-          <Button type="submit" className="w-full">
-            Se connecter
-          </Button>
-        </form>
-        <div className="mt-4 text-center text-sm">
-          Vous n'avez pas de compte ?{" "}
-          <Link href="/sign-up" className="underline">
-            S'inscrire
-          </Link>
-        </div>
-      </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Button variant="outline">
+              <GithubLogo className="mr-2" />
+              GitHub
+            </Button>
+            <Button variant="outline">
+              <GoogleLogo className="mr-2" />
+              Google
+            </Button>
+          </div>
+          <div className="mt-4 text-center text-sm">
+            Vous n'avez pas de compte ?{" "}
+            <Link href="/sign-up" className="underline">
+              S'inscrire
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

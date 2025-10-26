@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import AuthProvider from "@/components/session-provider";
 import { Toaster } from "@/components/ui/sonner"; // Import Toaster
+import { ConditionalNav } from "@/components/conditional-nav";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -32,7 +33,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <ConditionalNav />
+            {children}
+          </AuthProvider>
         </ThemeProvider>
         <Toaster /> {/* Add Toaster component here */}
       </body>
