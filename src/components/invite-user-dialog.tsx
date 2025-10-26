@@ -30,7 +30,7 @@ export function InviteUserDialog({ onUserInvited }: InviteUserDialogProps) {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success(`${data.message} Mot de passe temporaire: ${data.temporaryPassword}`);
+        toast.success(`${data.message}`);
         setIsInviteDialogOpen(false);
         setInviteEmail("");
         setInviteRole("MEMBER");
