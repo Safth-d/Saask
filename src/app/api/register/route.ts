@@ -1,0 +1,52 @@
+import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
+
+const prisma = new PrismaClient();
+
+export async function POST(req: Request) {
+  try {
+    const { name, email, password, tenantName, subdomain } = await req.json();
+
+    // Check if tenant already exists
+    const existingTenant = await prisma.tenant.findUnique({
+      where: { subdomain },
+    });
+
+    if (existingTenant) {
+      return NextResponse.json(
+        { message: "Sous-domaine déjà pris" },
+        { status: 409 }
+      );
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create new tenant and user
+    const newTenant = await prisma.tenant.create({
+      data: {
+        name: tenantName,
+        subdomain,
+        users: {
+          create: {
+            name,
+            email,
+            password: hashedPassword,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(
+      { message: "Utilisateur et Tenant créés avec succès", tenant: newTenant },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Registration error:", error);
+    return NextResponse.json(
+      { message: "Une erreur est survenue" },
+      { status: 500 }
+    );
+  }
+}
