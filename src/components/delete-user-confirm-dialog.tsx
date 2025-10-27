@@ -5,13 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
+import { ReactNode } from "react";
+
 interface DeleteUserConfirmDialogProps {
   user: { id: string; name: string | null; email: string | null; role: string };
   onUserDeleted: () => void;
   currentUserSessionId: string;
+  children: ReactNode;
 }
 
-export function DeleteUserConfirmDialog({ user, onUserDeleted, currentUserSessionId }: DeleteUserConfirmDialogProps) {
+export function DeleteUserConfirmDialog({ user, onUserDeleted, currentUserSessionId, children }: DeleteUserConfirmDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -50,7 +53,7 @@ export function DeleteUserConfirmDialog({ user, onUserDeleted, currentUserSessio
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="destructive" size="sm">Supprimer</Button>
+        {children}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

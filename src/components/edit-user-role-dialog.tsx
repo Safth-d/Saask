@@ -7,13 +7,16 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 
+import { ReactNode } from "react";
+
 interface EditUserRoleDialogProps {
   user: { id: string; name: string | null; email: string | null; role: string };
   onRoleUpdated: () => void;
   currentUserSessionId: string;
+  children: ReactNode;
 }
 
-export function EditUserRoleDialog({ user, onRoleUpdated, currentUserSessionId }: EditUserRoleDialogProps) {
+export function EditUserRoleDialog({ user, onRoleUpdated, currentUserSessionId, children }: EditUserRoleDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [newRole, setNewRole] = useState(user.role);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,7 +58,7 @@ export function EditUserRoleDialog({ user, onRoleUpdated, currentUserSessionId }
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">Modifier rôle</Button>
+        {children}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
