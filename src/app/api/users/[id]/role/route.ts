@@ -10,9 +10,11 @@ const updateUserRoleSchema = z.object({
   role: z.enum(["ADMIN", "MEMBER"]), // Ensure role is one of the defined enums
 });
 
+import { NextRequest } from "next/server";
+
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -21,9 +23,7 @@ export async function PUT(
     return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
   }
 
-  // Robustly get the ID from the request URL
-  const urlSegments = req.url.split('/');
-  const userIdToUpdate = urlSegments[urlSegments.length - 2];
+  const { id: userIdToUpdate } = await context.params;
 
   if (!userIdToUpdate) {
     return NextResponse.json({ message: "ID utilisateur manquant dans l'URL" }, { status: 400 });
