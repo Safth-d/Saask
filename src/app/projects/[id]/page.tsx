@@ -405,7 +405,7 @@ export default function ProjectDetailsPage({
 }) {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const projectId = React.use(params).id;
+  const projectId = params.id;
 
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
