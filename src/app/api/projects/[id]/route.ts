@@ -15,8 +15,9 @@ export async function GET(
     console.log("API: Session:", session); // Added log
 
     if (!session || !session.user || !session.user.tenantId) {
-    const { id } = context.params; // Corrected
-    console.log("API: Project ID:", id, "Tenant ID:", session.user.tenantId); // Added log
+      console.log("API: Unauthorized access - no session or tenantId"); // Added log
+      return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
+    }
 
     const project = await prisma.project.findFirst({
       where: {
