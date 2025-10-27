@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   console.log("API: GET /api/projects/[id] called"); // Added log
   try {
@@ -18,6 +18,9 @@ export async function GET(
       console.log("API: Unauthorized access - no session or tenantId"); // Added log
       return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
     }
+
+    const resolvedParams = await context.params;
+    const { id } = resolvedParams; // Corrected
 
     const project = await prisma.project.findFirst({
       where: {
@@ -44,7 +47,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -54,7 +57,8 @@ export async function PUT(
       return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
     }
 
-    const { id } = context.params; // Corrected
+    const resolvedParams = await context.params;
+    const { id } = resolvedParams; // Corrected
     const { name, description } = await request.json();
 
     if (!name) {
@@ -91,7 +95,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -101,7 +105,8 @@ export async function DELETE(
       return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
     }
 
-    const { id } = context.params; // Corrected
+    const resolvedParams = await context.params;
+    const { id } = resolvedParams; // Corrected
 
     const deletedProject = await prisma.project.deleteMany({
       where: {
