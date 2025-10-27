@@ -23,16 +23,19 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { email, role } = inviteUserSchema.parse(body);
 
-    // Check if user already exists in this tenant
-    const existingUser = await prisma.user.findFirst({
+    // Check if user already exists globally
+    const existingUser = await prisma.user.findUnique({
       where: {
         email,
-        tenantId: session.user.tenantId,
       },
     });
 
     if (existingUser) {
-      return NextResponse.json({ message: "Un utilisateur avec cet email existe déjà dans ce tenant." }, { status: 409 });
+      if (existingUser.tenantId === session.user.tenantId) {
+        return NextResponse.json({ message: "Un utilisateur avec cet email existe déjà dans votre organisation." }, { status: 409 });
+      } else {
+        return NextResponse.json({ message: "Cet email est déjà utilisé par une autre organisation." }, { status: 409 });
+      }
     }
 
     // Generate a temporary password (in a real app, this would be an invitation token sent via email)
@@ -52,7 +55,7 @@ export async function POST(req: Request) {
     // In a real application, you would send an invitation email here
     console.log(`Invitation email sent to ${newUser.email} with temporary password: ${temporaryPassword}`);
 
-    return NextResponse.json({ message: "Utilisateur invité avec succès.", user: { id: newUser.id, email: newUser.email, name: newUser.name, role: newUser.role }, temporaryPassword }, { status: 201 });
+    return NextResponse.json({ message: "Utilisateur invité avec succès.", user: { id: newUser.id, email: newUser.email, name: newUser.name, role: newUser.role } }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ message: error.errors[0].message }, { status: 400 });
