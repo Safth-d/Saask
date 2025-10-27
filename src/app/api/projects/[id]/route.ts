@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../api/auth/[...nextauth]/route"; // Adjust path as needed
@@ -6,8 +6,8 @@ import { authOptions } from "../../../api/auth/[...nextauth]/route"; // Adjust p
 const prisma = new PrismaClient();
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: { id: string } }
 ) {
   console.log("API: GET /api/projects/[id] called"); // Added log
   try {
@@ -15,11 +15,7 @@ export async function GET(
     console.log("API: Session:", session); // Added log
 
     if (!session || !session.user || !session.user.tenantId) {
-      console.log("API: Unauthorized access - no session or tenantId"); // Added log
-      return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
-    }
-
-    const { id } = params; // Corrected
+    const { id } = context.params; // Corrected
     console.log("API: Project ID:", id, "Tenant ID:", session.user.tenantId); // Added log
 
     const project = await prisma.project.findFirst({
@@ -46,8 +42,8 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -57,7 +53,7 @@ export async function PUT(
       return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
     }
 
-    const { id } = params; // Corrected
+    const { id } = context.params; // Corrected
     const { name, description } = await request.json();
 
     if (!name) {
@@ -93,8 +89,8 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -104,7 +100,7 @@ export async function DELETE(
       return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
     }
 
-    const { id } = params; // Corrected
+    const { id } = context.params; // Corrected
 
     const deletedProject = await prisma.project.deleteMany({
       where: {
