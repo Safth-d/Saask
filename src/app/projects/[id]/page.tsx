@@ -953,7 +953,7 @@ export default function ProjectDetailsPage({
           initial="hidden"
           animate="visible"
         >
-          {["todo", "inprogress", "done"].map((statusColumn) => (
+          {["todo", "inprogress", "done"] as const.map((statusColumn) => (
             <motion.div key={statusColumn} variants={columnVariants}>
               <DroppableColumn id={statusColumn} title={getTranslatedStatus(statusColumn)}>
                 <SortableContext items={tasksByStatus[statusColumn].map(task => task.id)} strategy={verticalListSortingStrategy}>
