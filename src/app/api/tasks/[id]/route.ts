@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../api/auth/[...nextauth]/route"; // Adjust path as needed
@@ -6,8 +6,8 @@ import { authOptions } from "../../../api/auth/[...nextauth]/route"; // Adjust p
 const prisma = new PrismaClient();
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,7 +16,7 @@ export async function GET(
       return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
     }
 
-    const { id } = await params; // Corrected
+    const { id } = await context.params;
 
     const task = await prisma.task.findFirst({
       where: {
@@ -52,8 +52,8 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -62,8 +62,7 @@ export async function PUT(
       return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
     }
 
-    // Robustly get the ID from the request URL instead of relying on params
-    const id = request.url.split('/').pop();
+    const { id } = await context.params;
 
     if (!id) {
       return NextResponse.json({ message: "ID de tâche manquant dans l'URL" }, { status: 400 });
@@ -128,8 +127,8 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -138,7 +137,7 @@ export async function DELETE(
       return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
     }
 
-    const { id } = await params; // Corrected
+    const { id } = await context.params;
 
     const deletedTask = await prisma.task.deleteMany({
       where: {
