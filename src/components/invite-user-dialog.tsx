@@ -9,11 +9,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { ReactNode } from "react";
+
 interface InviteUserDialogProps {
   onUserInvited: () => void;
+  children: ReactNode;
 }
 
-export function InviteUserDialog({ onUserInvited }: InviteUserDialogProps) {
+export function InviteUserDialog({ onUserInvited, children }: InviteUserDialogProps) {
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("MEMBER");
@@ -47,7 +50,7 @@ export function InviteUserDialog({ onUserInvited }: InviteUserDialogProps) {
   return (
     <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
       <DialogTrigger asChild>
-        <Button>Inviter un utilisateur</Button>
+        {children}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
