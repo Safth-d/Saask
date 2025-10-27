@@ -19,7 +19,7 @@ export async function GET(
       return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
     }
 
-    const { id } = await params; // Corrected
+    const { id } = params; // Corrected
     console.log("API: Project ID:", id, "Tenant ID:", session.user.tenantId); // Added log
 
     const project = await prisma.project.findFirst({
@@ -57,7 +57,7 @@ export async function PUT(
       return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
     }
 
-    const { id } = await params; // Corrected
+    const { id } = params; // Corrected
     const { name, description } = await request.json();
 
     if (!name) {
@@ -104,7 +104,7 @@ export async function DELETE(
       return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
     }
 
-    const { id } = await params; // Corrected
+    const { id } = params; // Corrected
 
     const deletedProject = await prisma.project.deleteMany({
       where: {
