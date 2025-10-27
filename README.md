@@ -4,7 +4,7 @@ Une application web collaborative de gestion de tâches et de projets, conçue p
 
 ## Démo Live
 
-> **Note:** Le lien vers la démo sera ajouté ici une fois le projet déployé.
+> **Démo Live :** [https://saask.netlify.app/](https://saask.netlify.app/)
 
 ## Fonctionnalités
 
@@ -21,6 +21,15 @@ Une application web collaborative de gestion de tâches et de projets, conçue p
     -   Expérience utilisateur soignée avec des animations subtiles, des icônes et des écrans de chargement "squelette".
     -   **Mode Sombre (Dark Mode)** avec possibilité de basculer entre les thèmes.
     -   Interface entièrement adaptative pour une utilisation sur mobile et tablette.
+
+## CI/CD
+
+Ce projet utilise GitHub Actions pour l'intégration continue. Le workflow, défini dans `.github/workflows/ci.yml`, se déclenche à chaque `push` ou `pull request` sur la branche `main` et exécute les actions suivantes :
+
+-   Installation de Node.js et des dépendances du projet.
+-   Exécution de la suite de tests avec `npm test`.
+
+Cela garantit que le code fusionné est toujours fonctionnel.
 
 ## Stack Technique
 
