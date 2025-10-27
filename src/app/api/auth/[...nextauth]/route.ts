@@ -4,7 +4,9 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
-export const authOptions = {
+import NextAuth, { AuthOptions, Session, JWT } from "next-auth";
+
+export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
@@ -50,7 +52,7 @@ export const authOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async session({ session, token }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       if (token) {
         session.user.id = token.id as string;
         session.user.name = token.name;
