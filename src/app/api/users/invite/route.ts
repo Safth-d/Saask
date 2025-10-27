@@ -58,7 +58,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "Utilisateur invité avec succès.", user: { id: newUser.id, email: newUser.email, name: newUser.name, role: newUser.role } }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ message: error.errors[0].message }, { status: 400 });
+      return NextResponse.json({ message: error.issues[0].message }, { status: 400 });
     }
     console.error("Erreur lors de l'invitation de l'utilisateur:", error);
     return NextResponse.json({ message: "Erreur interne du serveur" }, { status: 500 });

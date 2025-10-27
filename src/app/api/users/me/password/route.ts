@@ -49,7 +49,7 @@ export async function PUT(req: Request) {
     return NextResponse.json({ message: "Mot de passe mis à jour avec succès." }, { status: 200 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ message: error.errors[0].message }, { status: 400 });
+      return NextResponse.json({ message: error.issues[0].message }, { status: 400 });
     }
     console.error("Erreur lors de la mise à jour du mot de passe:", error);
     return NextResponse.json({ message: "Erreur interne du serveur" }, { status: 500 });
