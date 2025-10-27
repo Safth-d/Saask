@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { PrismaClient } from "@prisma/client";
@@ -6,8 +6,8 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
@@ -16,7 +16,7 @@ export async function DELETE(
     return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
   }
 
-  const userIdToDelete = params.id;
+  const { id: userIdToDelete } = await context.params;
   if (!userIdToDelete) {
     return NextResponse.json({ message: "ID utilisateur manquant" }, { status: 400 });
   }
