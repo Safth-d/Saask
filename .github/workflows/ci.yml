@@ -23,6 +23,10 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        env:
+          DATABASE_URL: "postgresql://user:password@host:port/db"
 
       - name: Run tests
         run: npm test
+        env:
+          DATABASE_URL: "postgresql://user:password@host:port/db"
