@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../api/auth/[...nextauth]/route"; // Adjust path as needed
 
-const prisma = new PrismaClient();
+
 
 export async function GET(
   request: NextRequest,
