@@ -1,13 +1,21 @@
 import { PrismaClient } from '@prisma/client';
+import { Pool } from '@neondatabase/serverless';
+import { PrismaNeon } from '@prisma/adapter-neon';
 
-// add prisma to the NodeJS global type
 declare global {
+  // allow global `var` declarations
+  // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined;
 }
 
-// prevent multiple instances of PrismaClient in development
-const prisma = global.prisma || new PrismaClient();
+const prisma =
+  global.prisma ||
+  (() => {
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    const adapter = new PrismaNeon(pool);
+    return new PrismaClient({ adapter });
+  })();
 
-if (process.env.NODE_ENV === 'development') global.prisma = prisma;
+if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
 
 export default prisma;

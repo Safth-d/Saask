@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
-import { z } from "zod";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 const updateUserRoleSchema = z.object({
   role: z.enum(["ADMIN", "MEMBER"]), // Ensure role is one of the defined enums
