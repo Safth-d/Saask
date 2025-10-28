@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CustomPortal } from "@/components/custom-portal";
 
 // Dnd-kit imports
 import {
@@ -999,13 +1000,13 @@ export default function ProjectDetails({
             </motion.div>
           ))}
         </motion.div>
-        <DragOverlay>
-          {activeTask ? (
-            <div style={{ zIndex: 9999, backgroundColor: 'rgba(255, 255, 0, 0.5)', padding: '10px', border: '2px solid red', color: 'black' }}>
-              Dragging: {activeTask.title}
-            </div>
-          ) : null}
-        </DragOverlay>
+            {activeTask ? (
+              <CustomPortal wrapperId="dnd-custom-portal">
+                <div style={{ zIndex: 9999, backgroundColor: 'rgba(255, 255, 0, 0.5)', padding: '10px', border: '2px solid red', color: 'black', position: 'fixed', top: '0px', left: '0px' }}>
+                  Dragging: {activeTask.title}
+                </div>
+              </CustomPortal>
+            ) : null}
       </DndContext>
 
       {/* Edit Task Dialog */}
