@@ -751,6 +751,8 @@ export default function ProjectDetails({
   const onDragStart = (event: any) => {
     console.log("Drag started:", event.active.id);
     setActiveId(event.active.id);
+    const foundTask = tasks.find((task) => task.id === event.active.id);
+    console.log("Active task found in tasks array:", foundTask);
   };
 
   const tasksByStatus = {
