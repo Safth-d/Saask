@@ -999,17 +999,9 @@ export default function ProjectDetails({
             </motion.div>
           ))}
         </motion.div>
-        <DragOverlay
-          wrapperElement="div"
-          style={{
-            zIndex: 9999,
-            backgroundColor: 'rgba(255, 255, 0, 0.5)', // Yellow with transparency
-            padding: '10px',
-            border: '2px solid red',
-          }}
-        >
+        <DragOverlay>
           {activeTask ? (
-            <div style={{ color: 'black' }}>
+            <div style={{ zIndex: 9999, backgroundColor: 'rgba(255, 255, 0, 0.5)', padding: '10px', border: '2px solid red', color: 'black' }}>
               Dragging: {activeTask.title}
             </div>
           ) : null}
