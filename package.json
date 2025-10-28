@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --setupFilesAfterEnv ./jest.setup.js",
-    "postinstall": "prisma generate --no-engine"
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
