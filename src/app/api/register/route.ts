@@ -41,10 +41,17 @@ export async function POST(req: Request) {
       { message: "Utilisateur et Tenant créés avec succès", tenant: newTenant },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      { message: "Une erreur est survenue" },
+      {
+        message: "Une erreur est survenue",
+        error: {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        },
+      },
       { status: 500 }
     );
   }
