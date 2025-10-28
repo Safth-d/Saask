@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CustomPortal } from "@/components/custom-portal";
 
 // Dnd-kit imports
 import {
@@ -444,6 +445,7 @@ export default function ProjectDetails({
   const [sortBy, setSortBy] = useState<string>("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [activeId, setActiveId] = useState<string | null>(null); // For drag overlay
+  const [cursorPosition, setCursorPosition] = useState<{ x: number; y: number } | null>(null);
 
   
 
@@ -946,6 +948,9 @@ export default function ProjectDetails({
         collisionDetection={closestCorners}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
+        onDragMove={(event) => {
+          setCursorPosition({ x: event.transform.x, y: event.transform.y });
+        }}
       >
         <div
           className="flex gap-4 overflow-x-auto pb-4"
@@ -983,13 +988,23 @@ export default function ProjectDetails({
             </motion.div>
           ))}
         </motion.div>
-        <DragOverlay>
-          {activeTask ? (
-            <div style={{ zIndex: 9999, backgroundColor: 'rgba(255, 255, 0, 0.5)', padding: '10px', border: '2px solid red', color: 'black' }}>
-              Dragging: {activeTask.title}
-            </div>
-          ) : null}
-        </DragOverlay>
+            {activeTask ? (
+              <CustomPortal wrapperId="dnd-custom-portal">
+                <div style={{
+                  zIndex: 9999,
+                  backgroundColor: 'rgba(255, 255, 0, 0.5)',
+                  padding: '10px',
+                  border: '2px solid red',
+                  color: 'black',
+                  position: 'fixed',
+                  top: cursorPosition?.y || 0,
+                  left: cursorPosition?.x || 0,
+                  transform: 'translate(-50%, -50%)', // Center the div on the cursor
+                }}>
+                  Dragging: {activeTask.title}
+                </div>
+              </CustomPortal>
+            ) : null}
       </DndContext>
 
       {/* Edit Task Dialog */}
