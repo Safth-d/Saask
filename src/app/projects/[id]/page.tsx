@@ -443,6 +443,11 @@ export default function ProjectDetailsPage({
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [activeId, setActiveId] = useState<string | null>(null); // For drag overlay
 
+  const [hasMounted, setHasMounted] = useState(false);
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -755,7 +760,7 @@ export default function ProjectDetailsPage({
 
   const activeTask = activeId ? tasks.find((task) => task.id === activeId) : null;
 
-  if (status === "loading" || !project) {
+  if (status === "loading" || !project || !hasMounted) {
     return <ProjectPageSkeleton />;
   }
 
