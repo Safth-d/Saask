@@ -189,6 +189,7 @@ interface User {
 
 // Component for a single draggable task item
 function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAssign }: {
+  console.log("Rendering SortableTask:", task.id, task.title);
   task: Task;
   tenantUsers: User[];
   onEdit: (task: Task) => void;
@@ -269,15 +270,15 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => onEdit(task)}>Modifier</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { console.log("Edit task clicked:", task.id); onEdit(task); }}>Modifier</DropdownMenuItem>
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>Assigner à...</DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent>
-                      <DropdownMenuItem onSelect={() => onAssign(task.id, null)}>Non assigné</DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => { console.log("Assign task to null clicked:", task.id); onAssign(task.id, null); }}>Non assigné</DropdownMenuItem>
                       <DropdownMenuSeparator />
                       {tenantUsers.map(user => (
-                        <DropdownMenuItem key={user.id} onSelect={() => onAssign(task.id, user.id)}>
+                        <DropdownMenuItem key={user.id} onSelect={() => { console.log("Assign task to user clicked:", task.id, user.id); onAssign(task.id, user.id); }}>
                           {user.name}
                         </DropdownMenuItem>
                       ))}
@@ -285,7 +286,7 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => onDelete(task.id)} className="text-red-600">
+                <DropdownMenuItem onClick={() => { console.log("Delete task clicked:", task.id); onDelete(task.id); }} className="text-red-600">
                   Supprimer
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -334,6 +335,7 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
 
 // Component for a droppable column
 function DroppableColumn({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
+  console.log("Rendering DroppableColumn:", id, title);
   const { setNodeRef } = useDroppable({ id });
 
   return (
@@ -660,6 +662,7 @@ export default function ProjectDetails({
     setIsEditTaskDialogOpen(true);
   };
   const onDragEnd = async (event: DragEndEvent) => {
+    console.log("Drag ended:", event.active.id, event.over?.id);
     const { active, over } = event;
     setActiveId(null);
 
@@ -746,6 +749,7 @@ export default function ProjectDetails({
   };
 
   const onDragStart = (event: any) => {
+    console.log("Drag started:", event.active.id);
     setActiveId(event.active.id);
   };
 
