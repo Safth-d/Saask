@@ -985,7 +985,7 @@ export default function ProjectDetails({
                   )}
                 </SortableContext>
               </DroppableColumn>
-            </motion.div>
+            </div>
           ))}
         </motion.div>
             {activeTask ? (
