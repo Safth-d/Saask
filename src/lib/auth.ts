@@ -1,4 +1,4 @@
-import { AuthOptions } from "next-auth";
+import { AuthOptions, getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
@@ -70,4 +70,8 @@ export const authOptions: AuthOptions = {
   pages: {
     signIn: "/sign-in",
   },
+};
+
+export const getCurrentSession = async () => {
+  return await getServerSession(authOptions);
 };
