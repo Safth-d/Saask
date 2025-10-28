@@ -189,7 +189,6 @@ interface User {
 
 // Component for a single draggable task item
 function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAssign }: {
-  console.log("Rendering SortableTask:", task.id, task.title);
   task: Task;
   tenantUsers: User[];
   onEdit: (task: Task) => void;
@@ -197,6 +196,7 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
   onMarkAsDone: (taskId: string) => void;
   onAssign: (taskId: string, assigneeId: string | null) => void;
 }) {
+  console.log("Rendering SortableTask:", task.id, task.title);
   const {
     attributes,
     listeners,
