@@ -999,7 +999,13 @@ export default function ProjectDetails({
             </motion.div>
           ))}
         </motion.div>
-        <DragOverlay>
+        <DragOverlay
+          wrapperElement="div"
+          style={{
+            zIndex: 9999,
+            backgroundColor: 'rgba(255, 255, 0, 0.5)', // Yellow with transparency
+          }}
+        >
           {activeTask ? (
             <SortableTask
               task={activeTask}
