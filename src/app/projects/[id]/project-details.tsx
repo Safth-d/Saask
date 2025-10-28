@@ -67,7 +67,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { motion } from "framer-motion";
+
 
 interface Project {
   id: string;
@@ -733,20 +733,7 @@ export default function ProjectDetails({
     }
   };
 
-  const columnsContainerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
 
-  const columnVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   const onDragStart = (event: any) => {
     console.log("Drag started:", event.active.id);
@@ -960,14 +947,11 @@ export default function ProjectDetails({
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
       >
-        <motion.div
+        <div
           className="flex gap-4 overflow-x-auto pb-4"
-          variants={columnsContainerVariants}
-          initial="hidden"
-          animate="visible"
         >
           {(['todo', 'inprogress', 'done'] as const).map((statusColumn) => (
-            <motion.div key={statusColumn} variants={columnVariants}>
+            <div key={statusColumn}>
               <DroppableColumn id={statusColumn} title={getTranslatedStatus(statusColumn)}>
                 <SortableContext items={tasksByStatus[statusColumn].map(task => task.id)} strategy={verticalListSortingStrategy}>
                   {tasksByStatus[statusColumn].length === 0 ? (
