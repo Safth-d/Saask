@@ -1004,17 +1004,14 @@ export default function ProjectDetails({
           style={{
             zIndex: 9999,
             backgroundColor: 'rgba(255, 255, 0, 0.5)', // Yellow with transparency
+            padding: '10px',
+            border: '2px solid red',
           }}
         >
           {activeTask ? (
-            <SortableTask
-              task={activeTask}
-              tenantUsers={tenantUsers}
-              onEdit={handleOpenEditDialog}
-              onDelete={handleDeleteTask}
-              onMarkAsDone={handleMarkAsDone}
-              onAssign={handleAssignTask}
-            />
+            <div style={{ color: 'black' }}>
+              Dragging: {activeTask.title}
+            </div>
           ) : null}
         </DragOverlay>
       </DndContext>
