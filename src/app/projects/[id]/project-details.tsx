@@ -269,12 +269,14 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
                 <Button
                   variant="ghost"
                   className="-mt-2 -mr-2 h-8 w-8 p-0"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onMouseDown={(e) => e.stopPropagation()}
                 >
                   <span className="sr-only">Ouvrir le menu</span>
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="z-[9999]">
+              <DropdownMenuContent align="end" sideOffset={6} className="z-[9999]" onCloseAutoFocus={(e) => e.preventDefault()}>
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => { console.log("Edit task clicked:", task.id); onEdit(task); }}>Modifier</DropdownMenuItem>
                 <DropdownMenuSub>
