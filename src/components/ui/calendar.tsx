@@ -190,6 +190,7 @@ function CalendarDayButton({
 
   return (
     <Button
+      type="button"
       ref={ref}
       variant="ghost"
       size="icon"
