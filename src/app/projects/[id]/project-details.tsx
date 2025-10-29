@@ -446,6 +446,7 @@ export default function ProjectDetails({
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [activeId, setActiveId] = useState<string | null>(null); // For drag overlay
   const [cursorPosition, setCursorPosition] = useState<{ x: number; y: number } | null>(null);
+  const [dragStartPosition, setDragStartPosition] = useState<{ x: number; y: number } | null>(null);
 
   
 
@@ -742,6 +743,14 @@ export default function ProjectDetails({
     setActiveId(event.active.id);
     const foundTask = tasks.find((task) => task.id === event.active.id);
     console.log("Active task found in tasks array:", foundTask);
+    const ae = event.activatorEvent as any;
+    if (ae) {
+      if (typeof ae.clientX === 'number' && typeof ae.clientY === 'number') {
+        setDragStartPosition({ x: ae.clientX, y: ae.clientY });
+      } else if (ae.touches && ae.touches[0]) {
+        setDragStartPosition({ x: ae.touches[0].clientX, y: ae.touches[0].clientY });
+      }
+    }
   };
 
   const tasksByStatus = {
@@ -949,7 +958,10 @@ export default function ProjectDetails({
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
         onDragMove={(event) => {
-          setCursorPosition({ x: event.transform.x, y: event.transform.y });
+          setCursorPosition({
+            x: (dragStartPosition?.x || 0) + event.delta.x,
+            y: (dragStartPosition?.y || 0) + event.delta.y,
+          });
         }}
       >
         <div
@@ -987,7 +999,7 @@ export default function ProjectDetails({
               </DroppableColumn>
             </div>
           ))}
-        </motion.div>
+        </div>
             {activeTask ? (
               <CustomPortal wrapperId="dnd-custom-portal">
                 <div style={{
