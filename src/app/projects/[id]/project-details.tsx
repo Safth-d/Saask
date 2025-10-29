@@ -249,7 +249,7 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
       <div className="flex items-start p-4">
         {/* Left Column: Handle and Timer */}
         <div className="flex flex-col items-center pr-4 gap-2 pt-1">
-          <div {...listeners} className="cursor-grab">
+          <div {...listeners} {...attributes} className="cursor-grab">
             <GripVertical className="h-5 w-5 text-muted-foreground/50" />
           </div>
           {task.status !== 'done' && <CircularTimer createdAt={task.createdAt} dueDate={task.dueDate} />}
@@ -266,12 +266,7 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
                 <Button
                   variant="ghost"
                   className="-mt-2 -mr-2 h-8 w-8 p-0"
-                  onPointerDown={(e) => e.stopPropagation()}
-                  onClickCapture={(e) => e.stopPropagation()}
-                  onClick={(e) => e.stopPropagation()}
-                  onMouseDown={(e) => e.stopPropagation()}
-                  onTouchStart={(e) => e.stopPropagation()}
-                  onKeyDown={(e) => e.stopPropagation()}
+                  onPointerDownCapture={(e) => e.stopPropagation()}
                 >
                   <span className="sr-only">Ouvrir le menu</span>
                   <MoreHorizontal className="h-4 w-4" />
