@@ -269,7 +269,6 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
                 <Button
                   variant="ghost"
                   className="-mt-2 -mr-2 h-8 w-8 p-0"
-                  onPointerDownCapture={(e) => e.stopPropagation()}
                 >
                   <span className="sr-only">Ouvrir le menu</span>
                   <MoreHorizontal className="h-4 w-4" />
