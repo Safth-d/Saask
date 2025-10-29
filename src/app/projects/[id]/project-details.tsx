@@ -264,7 +264,12 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
             </CardTitle>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="-mt-2 -mr-2 h-8 w-8 p-0" onPointerDown={(e) => e.stopPropagation()}>
+                <Button
+                  variant="ghost"
+                  className="-mt-2 -mr-2 h-8 w-8 p-0"
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClickCapture={(e) => e.stopPropagation()}
+                >
                   <span className="sr-only">Ouvrir le menu</span>
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
@@ -445,13 +450,11 @@ export default function ProjectDetails({
   const [sortBy, setSortBy] = useState<string>("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [activeId, setActiveId] = useState<string | null>(null); // For drag overlay
-  const [cursorPosition, setCursorPosition] = useState<{ x: number; y: number } | null>(null);
-  const [dragStartPosition, setDragStartPosition] = useState<{ x: number; y: number } | null>(null);
 
   
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -743,14 +746,6 @@ export default function ProjectDetails({
     setActiveId(event.active.id);
     const foundTask = tasks.find((task) => task.id === event.active.id);
     console.log("Active task found in tasks array:", foundTask);
-    const ae = event.activatorEvent as any;
-    if (ae) {
-      if (typeof ae.clientX === 'number' && typeof ae.clientY === 'number') {
-        setDragStartPosition({ x: ae.clientX, y: ae.clientY });
-      } else if (ae.touches && ae.touches[0]) {
-        setDragStartPosition({ x: ae.touches[0].clientX, y: ae.touches[0].clientY });
-      }
-    }
   };
 
   const tasksByStatus = {
@@ -957,12 +952,6 @@ export default function ProjectDetails({
         collisionDetection={closestCorners}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
-        onDragMove={(event) => {
-          setCursorPosition({
-            x: (dragStartPosition?.x || 0) + event.delta.x,
-            y: (dragStartPosition?.y || 0) + event.delta.y,
-          });
-        }}
       >
         <div
           className="flex gap-4 overflow-x-auto pb-4"
@@ -1000,23 +989,22 @@ export default function ProjectDetails({
             </div>
           ))}
         </div>
-            {activeTask ? (
-              <CustomPortal wrapperId="dnd-custom-portal">
-                <div style={{
-                  zIndex: 9999,
-                  backgroundColor: 'rgba(255, 255, 0, 0.5)',
-                  padding: '10px',
-                  border: '2px solid red',
-                  color: 'black',
-                  position: 'fixed',
-                  top: cursorPosition?.y || 0,
-                  left: cursorPosition?.x || 0,
-                  transform: 'translate(-50%, -50%)', // Center the div on the cursor
-                }}>
-                  Dragging: {activeTask.title}
+        <DragOverlay>
+          {activeTask ? (
+            <Card>
+              <div className="flex items-start p-4">
+                <div className="flex-grow">
+                  <CardTitle className="text-sm font-medium leading-snug">
+                    {activeTask.title}
+                  </CardTitle>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {activeTask.description || "Pas de description"}
+                  </p>
                 </div>
-              </CustomPortal>
-            ) : null}
+              </div>
+            </Card>
+          ) : null}
+        </DragOverlay>
       </DndContext>
 
       {/* Edit Task Dialog */}
