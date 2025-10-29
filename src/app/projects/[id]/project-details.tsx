@@ -847,7 +847,7 @@ export default function ProjectDetails({
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="taskDueDate">Date d'échéance</Label>
-                <Popover>
+                <Popover modal={false}>
                   <PopoverTrigger asChild>
                     <Button
                       variant={"outline"}
@@ -860,11 +860,11 @@ export default function ProjectDetails({
                       {newTaskDueDate ? format(newTaskDueDate, "PPP p", { locale: fr }) : <span>Choisir une date</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
+                  <PopoverContent className="w-auto p-0" onCloseAutoFocus={(e) => e.preventDefault()}>
                     <Calendar
                       mode="single"
                       selected={newTaskDueDate}
-                      onSelect={(day) => handleNewTaskDateTimeChange({ day })}
+                      onSelect={(day) => setNewTaskDueDate(day)}
                       initialFocus
                     />
                     <div className="p-3 border-t border-border">
@@ -872,7 +872,16 @@ export default function ProjectDetails({
                         type="time"
                         className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
                         value={newTaskDueDate ? format(newTaskDueDate, 'HH:mm') : ''}
-                        onChange={(e) => handleNewTaskDateTimeChange({ time: e.target.value })}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (!newTaskDueDate) return;
+                          const [hours, minutes] = val.split(':').map(Number);
+                          if (!isNaN(hours) && !isNaN(minutes)) {
+                            const d = new Date(newTaskDueDate);
+                            d.setHours(hours, minutes, 0, 0);
+                            setNewTaskDueDate(d);
+                          }
+                        }}
                       />
                     </div>
                   </PopoverContent>
@@ -1103,7 +1112,7 @@ export default function ProjectDetails({
                                           </div>
                                           <div className="grid gap-2">
                                             <Label htmlFor="editTaskDueDate">Date d'échéance</Label>
-                                            <Popover>
+                                          <Popover modal={false}>
                                               <PopoverTrigger asChild>
                                                 <Button
                                                   variant={"outline"}
@@ -1116,16 +1125,15 @@ export default function ProjectDetails({
                                                                                                                     {editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? format(new Date(editingTask.dueDate), "PPP p", { locale: fr }) : <span>Choisir une date</span>}
                                                                                                                   </Button>
                                                                                                                 </PopoverTrigger>
-                                                                                                                <PopoverContent className="w-auto p-0">
+                                                                                                                <PopoverContent className="w-auto p-0" onCloseAutoFocus={(e) => e.preventDefault()}>
                                                                                                                   <Calendar
                                                                                                                     mode="single"
                                                                                                                     selected={editingTask?.dueDate ? new Date(editingTask.dueDate) : undefined}
                                                                                                                     onSelect={(day) => {
-                                                                                                                      const newDate = editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? new Date(editingTask.dueDate) : new Date();
-                                                                                                                      if (day) {
-                                                                                                                        newDate.setFullYear(day.getFullYear(), day.getMonth(), day.getDate());
-                                                                                                                        setEditingTask((prev) => (prev ? { ...prev, dueDate: newDate.toISOString() } : null));
-                                                                                                                      }
+                                                                                                                      if (!day) return;
+                                                                                                                      const base = editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? new Date(editingTask.dueDate) : new Date();
+                                                                                                                      base.setFullYear(day.getFullYear(), day.getMonth(), day.getDate());
+                                                                                                                      setEditingTask((prev) => (prev ? { ...prev, dueDate: base.toISOString() } : null));
                                                                                                                     }}
                                                                                                                     initialFocus
                                                                                                                   />
