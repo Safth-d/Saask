@@ -264,7 +264,7 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
             <CardTitle className={`text-sm font-medium leading-snug ${task.status === 'done' ? "line-through text-muted-foreground" : ""}`}>
               {task.title}
             </CardTitle>
-            <DropdownMenu>
+            <DropdownMenu modal={false} onOpenChange={(open) => console.log('Task menu open:', open)}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -274,7 +274,7 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="z-[9999]">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => { console.log("Edit task clicked:", task.id); onEdit(task); }}>Modifier</DropdownMenuItem>
                 <DropdownMenuSub>
