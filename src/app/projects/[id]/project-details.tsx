@@ -247,7 +247,8 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
   };
 
   return (
-    <Card ref={setNodeRef} style={style}>
+    <div ref={setNodeRef} style={style}>
+      <Card>
       <div className="flex items-start p-4">
         {/* Left Column: Handle and Timer */}
         <div className="flex flex-col items-center pr-4 gap-2 pt-1">
@@ -335,7 +336,8 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
           </div>
         </div>
       </div>
-    </Card>
+      </Card>
+    </div>
   );
 }
 
