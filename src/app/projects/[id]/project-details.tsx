@@ -58,6 +58,7 @@ import {
   useSensors,
   DragEndEvent,
   useDroppable,
+  DragOverlay,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -987,6 +988,29 @@ export default function ProjectDetails({
             </div>
           ))}
         </div>
+        {/* Overlay pour un retour visuel clair pendant le drag */}
+        <DragOverlay>
+          {activeTask ? (
+            <Card className="opacity-90">
+              <div className="flex items-start p-4">
+                <div className="flex flex-col items-center pr-4 gap-2 pt-1">
+                  <GripVertical className="h-5 w-5 text-muted-foreground/50" />
+                  {activeTask.status !== 'done' && (
+                    <CircularTimer createdAt={activeTask.createdAt} dueDate={activeTask.dueDate} />
+                  )}
+                </div>
+                <div className="flex-grow">
+                  <div className="flex justify-between items-start">
+                    <CardTitle className={`text-sm font-medium leading-snug ${activeTask.status === 'done' ? "line-through text-muted-foreground" : ""}`}>
+                      {activeTask.title}
+                    </CardTitle>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">{activeTask.description || "Pas de description"}</p>
+                </div>
+              </div>
+            </Card>
+          ) : null}
+        </DragOverlay>
       </DndContext>
 
       {/* Edit Task Dialog */}
