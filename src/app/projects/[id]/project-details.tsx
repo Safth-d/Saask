@@ -57,7 +57,6 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-  DragOverlay,
   useDroppable,
 } from "@dnd-kit/core";
 import {
@@ -246,7 +245,7 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
   };
 
   return (
-    <Card ref={setNodeRef} style={style} {...attributes}>
+    <Card ref={setNodeRef} style={style}>
       <div className="flex items-start p-4">
         {/* Left Column: Handle and Timer */}
         <div className="flex flex-col items-center pr-4 gap-2 pt-1">
@@ -269,6 +268,10 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
                   className="-mt-2 -mr-2 h-8 w-8 p-0"
                   onPointerDown={(e) => e.stopPropagation()}
                   onClickCapture={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => e.stopPropagation()}
                 >
                   <span className="sr-only">Ouvrir le menu</span>
                   <MoreHorizontal className="h-4 w-4" />
@@ -449,7 +452,7 @@ export default function ProjectDetails({
   const [filterPriority, setFilterPriority] = useState<string>("ALL");
   const [sortBy, setSortBy] = useState<string>("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [activeId, setActiveId] = useState<string | null>(null); // For drag overlay
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   
 
@@ -989,22 +992,6 @@ export default function ProjectDetails({
             </div>
           ))}
         </div>
-        <DragOverlay>
-          {activeTask ? (
-            <Card>
-              <div className="flex items-start p-4">
-                <div className="flex-grow">
-                  <CardTitle className="text-sm font-medium leading-snug">
-                    {activeTask.title}
-                  </CardTitle>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {activeTask.description || "Pas de description"}
-                  </p>
-                </div>
-              </div>
-            </Card>
-          ) : null}
-        </DragOverlay>
       </DndContext>
 
       {/* Edit Task Dialog */}
