@@ -202,6 +202,7 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
     attributes,
     listeners,
     setNodeRef,
+    setActivatorNodeRef,
     transform,
     transition,
     isDragging,
@@ -250,7 +251,7 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
       <div className="flex items-start p-4">
         {/* Left Column: Handle and Timer */}
         <div className="flex flex-col items-center pr-4 gap-2 pt-1">
-          <div {...listeners} {...attributes} className="cursor-grab">
+          <div ref={setActivatorNodeRef} {...listeners} {...attributes} className="cursor-grab">
             <GripVertical className="h-5 w-5 text-muted-foreground/50" />
           </div>
           {task.status !== 'done' && <CircularTimer createdAt={task.createdAt} dueDate={task.dueDate} />}
