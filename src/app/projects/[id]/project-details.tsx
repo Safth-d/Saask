@@ -198,6 +198,7 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
   onAssign: (taskId: string, assigneeId: string | null) => void;
 }) {
   console.log("Rendering SortableTask:", task.id, task.title);
+  const [menuOpen, setMenuOpen] = useState(false);
   const {
     attributes,
     listeners,
@@ -264,19 +265,12 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
             <CardTitle className={`text-sm font-medium leading-snug ${task.status === 'done' ? "line-through text-muted-foreground" : ""}`}>
               {task.title}
             </CardTitle>
-            <DropdownMenu modal={false} onOpenChange={(open) => console.log('Task menu open:', open)}>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="-mt-2 -mr-2 h-8 w-8 p-0"
-                    onPointerDown={(e) => e.stopPropagation()}
-                    onMouseDown={(e) => e.stopPropagation()}
-                >
-                  <span className="sr-only">Ouvrir le menu</span>
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
+            <DropdownMenu modal={false} open={menuOpen} onOpenChange={(open) => { setMenuOpen(open); console.log('Task menu open:', open); }}>
+              <DropdownMenuTrigger className="-mt-2 -mr-2 h-8 w-8 p-0 inline-flex items-center justify-center rounded-md hover:bg-accent focus:outline-none">
+                <span className="sr-only">Ouvrir le menu</span>
+                <MoreHorizontal className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" sideOffset={6} className="z-[9999]" onCloseAutoFocus={(e) => e.preventDefault()}>
+              <DropdownMenuContent align="end" side="bottom" sideOffset={6} avoidCollisions={false} className="z-[9999]" onCloseAutoFocus={(e) => e.preventDefault()} onInteractOutside={(e) => { e.preventDefault(); }}>
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => { console.log("Edit task clicked:", task.id); onEdit(task); }}>Modifier</DropdownMenuItem>
                 <DropdownMenuSub>
