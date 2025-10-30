@@ -442,6 +442,8 @@ export default function ProjectDetails({
   const [isCreateTaskDialogOpen, setIsCreateTaskDialogOpen] = useState(false);
   const [isEditTaskDialogOpen, setIsEditTaskDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [isCreateDuePopoverOpen, setIsCreateDuePopoverOpen] = useState(false);
+  const [isEditDuePopoverOpen, setIsEditDuePopoverOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
   const [filterPriority, setFilterPriority] = useState<string>("ALL");
   const [sortBy, setSortBy] = useState<string>("createdAt");
@@ -847,7 +849,7 @@ export default function ProjectDetails({
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="taskDueDate">Date d'échéance</Label>
-                <Popover modal={false}>
+                <Popover modal={false} open={isCreateDuePopoverOpen} onOpenChange={(o)=>{ console.log('Create due popover open:', o); setIsCreateDuePopoverOpen(o); }}>
                   <PopoverTrigger asChild>
                     <Button
                       variant={"outline"}
@@ -855,12 +857,13 @@ export default function ProjectDetails({
                         "justify-start text-left font-normal",
                         !newTaskDueDate && "text-muted-foreground"
                       )}
+                      onClick={()=> setIsCreateDuePopoverOpen((v)=>!v)}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {newTaskDueDate ? format(newTaskDueDate, "PPP p", { locale: fr }) : <span>Choisir une date</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" onCloseAutoFocus={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()}>
+                  <PopoverContent side="bottom" align="start" sideOffset={8} avoidCollisions={false} className="w-auto p-0 z-[9999]" onCloseAutoFocus={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()}>
                     <Calendar
                       mode="single"
                       selected={newTaskDueDate}
@@ -1113,7 +1116,7 @@ export default function ProjectDetails({
                                           </div>
                                           <div className="grid gap-2">
                                             <Label htmlFor="editTaskDueDate">Date d'échéance</Label>
-                                          <Popover modal={false}>
+                                          <Popover modal={false} open={isEditDuePopoverOpen} onOpenChange={(o)=>{ console.log('Edit due popover open:', o); setIsEditDuePopoverOpen(o); }}>
                                               <PopoverTrigger asChild>
                                                 <Button
                                                   variant={"outline"}
@@ -1121,12 +1124,13 @@ export default function ProjectDetails({
                                                                           "justify-start text-left font-normal",
                                                                           !editingTask?.dueDate && "text-muted-foreground"
                                                                         )}
+                                                  onClick={()=> setIsEditDuePopoverOpen((v)=>!v)}
                                                                       >
                                                                                                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                                                                                                     {editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? format(new Date(editingTask.dueDate), "PPP p", { locale: fr }) : <span>Choisir une date</span>}
                                                                                                                   </Button>
                                                                                                                 </PopoverTrigger>
-                                                                                                                <PopoverContent className="w-auto p-0" onCloseAutoFocus={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()}>
+                                                                                                                <PopoverContent side="bottom" align="start" sideOffset={8} avoidCollisions={false} className="w-auto p-0 z-[9999]" onCloseAutoFocus={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()}>
                                                                                                                   <Calendar
                                                                                                                     mode="single"
                                                                                                                     selected={editingTask?.dueDate ? new Date(editingTask.dueDate) : undefined}
