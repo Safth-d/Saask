@@ -757,9 +757,10 @@ export default function ProjectDetails({
   return (
     <div className="min-h-screen p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-          <Folder className="mr-4 h-8 w-8" />
-          {project.name}
-        </h1>
+          <h1 className="text-4xl font-bold flex items-center">
+            <Folder className="mr-4 h-8 w-8" />
+            {project.name}
+          </h1>
                 <Button onClick={() => router.push("/dashboard")}><ArrowLeft className="mr-2 h-4 w-4" />Retour au tableau de bord</Button>
       </div>
 
