@@ -863,7 +863,7 @@ export default function ProjectDetails({
                       {newTaskDueDate ? format(newTaskDueDate, "PPP p", { locale: fr }) : <span>Choisir une date</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent side="bottom" align="start" sideOffset={8} avoidCollisions={false} className="w-auto p-0 z-[100000]" onCloseAutoFocus={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()}>
+                  <PopoverContent side="bottom" align="start" sideOffset={8} avoidCollisions={false} className="w-auto p-0 z-[100000] border bg-popover" onCloseAutoFocus={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()} disablePortal>
                     <Calendar
                       mode="single"
                       selected={newTaskDueDate}
@@ -1129,7 +1129,7 @@ export default function ProjectDetails({
                                                                                                                     {editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? format(new Date(editingTask.dueDate), "PPP p", { locale: fr }) : <span>Choisir une date</span>}
                                                                                                                   </Button>
                                                                                                                 </PopoverTrigger>
-                                                                                                                <PopoverContent side="bottom" align="start" sideOffset={8} avoidCollisions={false} className="w-auto p-0 z-[100000]" onCloseAutoFocus={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()}>
+                                                                                                                <PopoverContent side="bottom" align="start" sideOffset={8} avoidCollisions={false} className="w-auto p-0 z-[100000] border bg-popover" onCloseAutoFocus={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()} disablePortal>
                                                                                                                   <Calendar
                                                                                                                     mode="single"
                                                                                                                     selected={editingTask?.dueDate ? new Date(editingTask.dueDate) : undefined}
