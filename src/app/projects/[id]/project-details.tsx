@@ -890,6 +890,33 @@ export default function ProjectDetails({
                     </div>
                   </PopoverContent>
                 </Popover>
+                {isCreateDuePopoverOpen && (
+                  <div className="mt-2 border rounded-md bg-popover z-[100000] p-0">
+                    <Calendar
+                      mode="single"
+                      selected={newTaskDueDate}
+                      onSelect={(day) => { console.log('Create calendar inline onSelect', day); setNewTaskDueDate(day); }}
+                      initialFocus
+                    />
+                    <div className="p-3 border-t border-border">
+                      <input 
+                        type="time"
+                        className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+                        value={newTaskDueDate ? format(newTaskDueDate, 'HH:mm') : ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (!newTaskDueDate) return;
+                          const [hours, minutes] = val.split(':').map(Number);
+                          if (!isNaN(hours) && !isNaN(minutes)) {
+                            const d = new Date(newTaskDueDate);
+                            d.setHours(hours, minutes, 0, 0);
+                            setNewTaskDueDate(d);
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
               <Button type="submit">Créer la tâche</Button>
             </form>
@@ -1165,6 +1192,37 @@ export default function ProjectDetails({
                                                                                                                     />
                                                                                                                   </div>                                              </PopoverContent>
                                             </Popover>
+                                          {isEditDuePopoverOpen && (
+                                            <div className="mt-2 border rounded-md bg-popover z-[100000] p-0">
+                                              <Calendar
+                                                mode="single"
+                                                selected={editingTask?.dueDate ? new Date(editingTask.dueDate) : undefined}
+                                                onSelect={(day) => {
+                                                  console.log('Edit calendar inline onSelect', day);
+                                                  if (!day) return;
+                                                  const base = editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? new Date(editingTask.dueDate) : new Date();
+                                                  base.setFullYear(day.getFullYear(), day.getMonth(), day.getDate());
+                                                  setEditingTask((prev) => (prev ? { ...prev, dueDate: base.toISOString() } : null));
+                                                }}
+                                                initialFocus
+                                              />
+                                              <div className="p-3 border-t border-border">
+                                                <input 
+                                                  type="time"
+                                                  className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+                                                  value={editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? format(new Date(editingTask.dueDate), 'HH:mm') : ''}
+                                                  onChange={(e) => {
+                                                    const newDate = editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? new Date(editingTask.dueDate) : new Date();
+                                                    const [hours, minutes] = e.target.value.split(':').map(Number);
+                                                    if (!isNaN(hours) && !isNaN(minutes)) {
+                                                      newDate.setHours(hours, minutes, 0, 0);
+                                                      setEditingTask((prev) => (prev ? { ...prev, dueDate: newDate.toISOString() } : null));
+                                                    }
+                                                  }}
+                                                />
+                                              </div>
+                                            </div>
+                                          )}
                                           </div>            <Button type="submit">Enregistrer les modifications</Button>
           </form>
         </DialogContent>
