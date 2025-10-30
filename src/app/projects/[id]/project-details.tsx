@@ -860,11 +860,12 @@ export default function ProjectDetails({
                       {newTaskDueDate ? format(newTaskDueDate, "PPP p", { locale: fr }) : <span>Choisir une date</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" onCloseAutoFocus={(e) => e.preventDefault()}>
+                  <PopoverContent className="w-auto p-0" onCloseAutoFocus={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()}>
                     <Calendar
                       mode="single"
                       selected={newTaskDueDate}
-                      onSelect={(day) => setNewTaskDueDate(day)}
+                      onSelect={(day) => { console.log('Create calendar onSelect', day); setNewTaskDueDate(day); }}
+                      onDayClick={(day) => { console.log('Create calendar onDayClick', day); setNewTaskDueDate(day); }}
                       initialFocus
                     />
                     <div className="p-3 border-t border-border">
@@ -1125,12 +1126,19 @@ export default function ProjectDetails({
                                                                                                                     {editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? format(new Date(editingTask.dueDate), "PPP p", { locale: fr }) : <span>Choisir une date</span>}
                                                                                                                   </Button>
                                                                                                                 </PopoverTrigger>
-                                                                                                                <PopoverContent className="w-auto p-0" onCloseAutoFocus={(e) => e.preventDefault()}>
+                                                                                                                <PopoverContent className="w-auto p-0" onCloseAutoFocus={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()}>
                                                                                                                   <Calendar
                                                                                                                     mode="single"
                                                                                                                     selected={editingTask?.dueDate ? new Date(editingTask.dueDate) : undefined}
                                                                                                                     onSelect={(day) => {
+                                                                                                                      console.log('Edit calendar onSelect', day);
                                                                                                                       if (!day) return;
+                                                                                                                      const base = editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? new Date(editingTask.dueDate) : new Date();
+                                                                                                                      base.setFullYear(day.getFullYear(), day.getMonth(), day.getDate());
+                                                                                                                      setEditingTask((prev) => (prev ? { ...prev, dueDate: base.toISOString() } : null));
+                                                                                                                    }}
+                                                                                                                    onDayClick={(day) => {
+                                                                                                                      console.log('Edit calendar onDayClick', day);
                                                                                                                       const base = editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? new Date(editingTask.dueDate) : new Date();
                                                                                                                       base.setFullYear(day.getFullYear(), day.getMonth(), day.getDate());
                                                                                                                       setEditingTask((prev) => (prev ? { ...prev, dueDate: base.toISOString() } : null));
