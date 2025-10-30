@@ -442,8 +442,8 @@ export default function ProjectDetails({
   const [isCreateTaskDialogOpen, setIsCreateTaskDialogOpen] = useState(false);
   const [isEditTaskDialogOpen, setIsEditTaskDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [isCreateDuePopoverOpen, setIsCreateDuePopoverOpen] = useState(false);
-  const [isEditDuePopoverOpen, setIsEditDuePopoverOpen] = useState(false);
+  const [isCreateDueDialogOpen, setIsCreateDueDialogOpen] = useState(false);
+  const [isEditDueDialogOpen, setIsEditDueDialogOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
   const [filterPriority, setFilterPriority] = useState<string>("ALL");
   const [sortBy, setSortBy] = useState<string>("createdAt");
@@ -849,28 +849,30 @@ export default function ProjectDetails({
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="taskDueDate">Date d'échéance</Label>
-                <Popover modal={false} open={isCreateDuePopoverOpen} onOpenChange={(o)=>{ console.log('Create due popover open:', o); setIsCreateDuePopoverOpen(o); }}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "justify-start text-left font-normal",
-                        !newTaskDueDate && "text-muted-foreground"
-                      )}
-                      onClick={()=> setIsCreateDuePopoverOpen((v)=>!v)}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {newTaskDueDate ? format(newTaskDueDate, "PPP p", { locale: fr }) : <span>Choisir une date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent side="bottom" align="start" sideOffset={8} avoidCollisions={false} className="w-auto p-0 z-[100000] border bg-popover" onCloseAutoFocus={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()} disablePortal>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "justify-start text-left font-normal",
+                    !newTaskDueDate && "text-muted-foreground"
+                  )}
+                  onClick={()=> setIsCreateDueDialogOpen(true)}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {newTaskDueDate ? format(newTaskDueDate, "PPP p", { locale: fr }) : <span>Choisir une date</span>}
+                </Button>
+
+                <Dialog open={isCreateDueDialogOpen} onOpenChange={setIsCreateDueDialogOpen}>
+                  <DialogContent className="flex flex-col items-center gap-4 w-auto">
+                    <DialogHeader>
+                      <DialogTitle>Sélectionner la date d'échéance</DialogTitle>
+                    </DialogHeader>
                     <Calendar
                       mode="single"
                       selected={newTaskDueDate}
-                      onSelect={(day) => { console.log('Create calendar onSelect', day); setNewTaskDueDate(day); }}
+                      onSelect={(day) => { setNewTaskDueDate(day); }}
                       initialFocus
                     />
-                    <div className="p-3 border-t border-border">
+                    <div className="w-full">
                       <input 
                         type="time"
                         className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
@@ -887,8 +889,8 @@ export default function ProjectDetails({
                         }}
                       />
                     </div>
-                  </PopoverContent>
-                </Popover>
+                  </DialogContent>
+                </Dialog>
               </div>
               <Button type="submit">Créer la tâche</Button>
             </form>
@@ -1115,62 +1117,26 @@ export default function ProjectDetails({
                                           </div>
                                           <div className="grid gap-2">
                                             <Label htmlFor="editTaskDueDate">Date d'échéance</Label>
-                                          <Popover modal={false} open={isEditDuePopoverOpen} onOpenChange={(o)=>{ console.log('Edit due popover open:', o); setIsEditDuePopoverOpen(o); }}>
-                                              <PopoverTrigger asChild>
-                                                <Button
-                                                  variant={"outline"}
-                                                                        className={cn(
-                                                                          "justify-start text-left font-normal",
-                                                                          !editingTask?.dueDate && "text-muted-foreground"
-                                                                        )}
-                                                  onClick={()=> setIsEditDuePopoverOpen((v)=>!v)}
-                                                                      >
-                                                                                                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                                                                                                    {editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? format(new Date(editingTask.dueDate), "PPP p", { locale: fr }) : <span>Choisir une date</span>}
-                                                                                                                  </Button>
-                                                                                                                </PopoverTrigger>
-                                                                                                                <PopoverContent side="bottom" align="start" sideOffset={8} avoidCollisions={false} className="w-auto p-0 z-[100000] border bg-popover" onCloseAutoFocus={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()} disablePortal>
-                                                                                                                  <Calendar
-                                                                                                                    mode="single"
-                                                                                                                    selected={editingTask?.dueDate ? new Date(editingTask.dueDate) : undefined}
-                                                                                                                    onSelect={(day) => {
-                                                                                                                      console.log('Edit calendar onSelect', day);
-                                                                                                                      if (!day) return;
-                                                                                                                      const base = editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? new Date(editingTask.dueDate) : new Date();
-                                                                                                                      base.setFullYear(day.getFullYear(), day.getMonth(), day.getDate());
-                                                                                                                      setEditingTask((prev) => (prev ? { ...prev, dueDate: base.toISOString() } : null));
-                                                                                                                    }}
-                                                                                                                    onDayClick={(day) => {
-                                                                                                                      console.log('Edit calendar onDayClick', day);
-                                                                                                                      const base = editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? new Date(editingTask.dueDate) : new Date();
-                                                                                                                      base.setFullYear(day.getFullYear(), day.getMonth(), day.getDate());
-                                                                                                                      setEditingTask((prev) => (prev ? { ...prev, dueDate: base.toISOString() } : null));
-                                                                                                                    }}
-                                                                                                                    initialFocus
-                                                                                                                  />
-                                                                                                                  <div className="p-3 border-t border-border">
-                                                                                                                    <input 
-                                                                                                                      type="time"
-                                                                                                                      className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
-                                                                                                                      value={editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? format(new Date(editingTask.dueDate), 'HH:mm') : ''}
-                                                                                                                      onChange={(e) => {
-                                                                                                                        const newDate = editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? new Date(editingTask.dueDate) : new Date();
-                                                                                                                        const [hours, minutes] = e.target.value.split(':').map(Number);
-                                                                                                                        if (!isNaN(hours) && !isNaN(minutes)) {
-                                                                                                                          newDate.setHours(hours, minutes, 0, 0);
-                                                                                                                          setEditingTask((prev) => (prev ? { ...prev, dueDate: newDate.toISOString() } : null));
-                                                                                                                        }
-                                                                                                                      }}
-                                                                                                                    />
-                                                                                                                  </div>                                              </PopoverContent>
-                                            </Popover>
-                                          {isEditDuePopoverOpen && (
-                                            <div className="mt-2 border rounded-md bg-popover z-[100000] p-0">
+                                          <Button
+                                            variant={"outline"}
+                                            className={cn(
+                                              "justify-start text-left font-normal",
+                                              !editingTask?.dueDate && "text-muted-foreground"
+                                            )}
+                                            onClick={()=> setIsEditDueDialogOpen(true)}
+                                          >
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? format(new Date(editingTask.dueDate), "PPP p", { locale: fr }) : <span>Choisir une date</span>}
+                                          </Button>
+                                          <Dialog open={isEditDueDialogOpen} onOpenChange={setIsEditDueDialogOpen}>
+                                            <DialogContent className="flex flex-col items-center gap-4 w-auto">
+                                              <DialogHeader>
+                                                <DialogTitle>Sélectionner la date d'échéance</DialogTitle>
+                                              </DialogHeader>
                                               <Calendar
                                                 mode="single"
                                                 selected={editingTask?.dueDate ? new Date(editingTask.dueDate) : undefined}
                                                 onSelect={(day) => {
-                                                  console.log('Edit calendar inline onSelect', day);
                                                   if (!day) return;
                                                   const base = editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? new Date(editingTask.dueDate) : new Date();
                                                   base.setFullYear(day.getFullYear(), day.getMonth(), day.getDate());
@@ -1178,7 +1144,7 @@ export default function ProjectDetails({
                                                 }}
                                                 initialFocus
                                               />
-                                              <div className="p-3 border-t border-border">
+                                              <div className="w-full">
                                                 <input 
                                                   type="time"
                                                   className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
@@ -1193,8 +1159,8 @@ export default function ProjectDetails({
                                                   }}
                                                 />
                                               </div>
-                                            </div>
-                                          )}
+                                            </DialogContent>
+                                          </Dialog>
                                           </div>            <Button type="submit">Enregistrer les modifications</Button>
           </form>
         </DialogContent>
