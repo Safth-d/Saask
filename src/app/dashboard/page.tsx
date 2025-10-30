@@ -64,6 +64,7 @@ export default function DashboardPage() {
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectDescription, setNewProjectDescription] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoadingProjects, setIsLoadingProjects] = useState(true); // New state
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -75,6 +76,7 @@ export default function DashboardPage() {
   }, [status, router]);
 
   const fetchProjects = async () => {
+    setIsLoadingProjects(true); // Set loading to true before fetching
     const res = await fetch("/api/projects");
     if (res.ok) {
       const data = await res.json();
@@ -82,6 +84,7 @@ export default function DashboardPage() {
     } else {
       toast.error("Échec de la récupération des projets.");
     }
+    setIsLoadingProjects(false); // Set loading to false after fetching
   };
 
   const handleCreateProject = async (e: React.FormEvent) => {
@@ -109,7 +112,7 @@ export default function DashboardPage() {
     }
   };
 
-  if (status === "loading") {
+  if (status === "loading" || isLoadingProjects) { // Modified condition
     return (
       <div className="min-h-screen p-8">
         <div className="flex justify-between items-center mb-4 mt-8">
@@ -187,7 +190,9 @@ export default function DashboardPage() {
                 initial="hidden"
                 animate="visible"
               >
-                {projects.length === 0 ? (
+                {isLoadingProjects ? ( // Show skeleton if projects are still loading
+                  <DashboardSkeleton />
+                ) : projects.length === 0 ? ( // Only show "no projects" if not loading and empty
                   <div className="text-center col-span-3">
                     <Image
                       src="/file.svg"
