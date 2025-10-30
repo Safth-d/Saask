@@ -197,7 +197,7 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
   onMarkAsDone: (taskId: string) => void;
   onAssign: (taskId: string, assigneeId: string | null) => void;
 }) {
-  console.log("Rendering SortableTask:", task.id, task.title);
+
   const [menuOpen, setMenuOpen] = useState(false);
   const {
     attributes,
@@ -265,22 +265,22 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
             <CardTitle className={`text-sm font-medium leading-snug ${task.status === 'done' ? "line-through text-muted-foreground" : ""}`}>
               {task.title}
             </CardTitle>
-            <DropdownMenu modal={false} open={menuOpen} onOpenChange={(open) => { setMenuOpen(open); console.log('Task menu open:', open); }}>
+            <DropdownMenu modal={false} open={menuOpen} onOpenChange={(open) => { setMenuOpen(open); }}>
               <DropdownMenuTrigger className="-mt-2 -mr-2 h-8 w-8 p-0 inline-flex items-center justify-center rounded-md hover:bg-accent focus:outline-none">
                 <span className="sr-only">Ouvrir le menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" side="bottom" sideOffset={6} avoidCollisions={false} className="z-[9999]" onCloseAutoFocus={(e) => e.preventDefault()} onInteractOutside={(e) => { e.preventDefault(); }}>
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => { console.log("Edit task clicked:", task.id); onEdit(task); }}>Modifier</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { onEdit(task); }}>Modifier</DropdownMenuItem>
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>Assigner à...</DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent>
-                      <DropdownMenuItem onSelect={() => { console.log("Assign task to null clicked:", task.id); onAssign(task.id, null); }}>Non assigné</DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => { onAssign(task.id, null); }}>Non assigné</DropdownMenuItem>
                       <DropdownMenuSeparator />
                       {tenantUsers.map(user => (
-                        <DropdownMenuItem key={user.id} onSelect={() => { console.log("Assign task to user clicked:", task.id, user.id); onAssign(task.id, user.id); }}>
+                        <DropdownMenuItem key={user.id} onSelect={() => { onAssign(task.id, user.id); }}>
                           {user.name}
                         </DropdownMenuItem>
                       ))}
@@ -288,7 +288,7 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => { console.log("Delete task clicked:", task.id); onDelete(task.id); }} className="text-red-600">
+                <DropdownMenuItem onClick={() => { onDelete(task.id); }} className="text-red-600">
                   Supprimer
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -338,7 +338,6 @@ function SortableTask({ task, tenantUsers, onEdit, onDelete, onMarkAsDone, onAss
 
 // Component for a droppable column
 function DroppableColumn({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
-  console.log("Rendering DroppableColumn:", id, title);
   const { setNodeRef } = useDroppable({ id });
 
   return (
@@ -667,7 +666,6 @@ export default function ProjectDetails({
     setIsEditTaskDialogOpen(true);
   };
   const onDragEnd = async (event: DragEndEvent) => {
-    console.log("Drag ended:", event.active.id, event.over?.id);
     const { active, over } = event;
     setActiveId(null);
 
@@ -741,10 +739,7 @@ export default function ProjectDetails({
 
 
   const onDragStart = (event: any) => {
-    console.log("Drag started:", event.active.id);
     setActiveId(event.active.id);
-    const foundTask = tasks.find((task) => task.id === event.active.id);
-    console.log("Active task found in tasks array:", foundTask);
   };
 
   const tasksByStatus = {
