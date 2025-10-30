@@ -15,7 +15,7 @@ function Calendar({
   className,
   classNames,
   showOutsideDays = true,
-  captionLayout = "label",
+  captionLayout = "dropdown",
   buttonVariant = "ghost",
   formatters,
   components,
@@ -24,14 +24,15 @@ function Calendar({
   buttonVariant?: React.ComponentProps<typeof Button>["variant"]
 }) {
   const defaultClassNames = getDefaultClassNames()
-
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn(
-        "bg-background group/calendar p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
-        String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
-        String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
+        "bg-white dark:bg-neutral-900 rounded-xl shadow-2xl mx-auto p-4 max-w-full w-full group/calendar border border-border",
+        "[--cell-size:44px] sm:[--cell-size:52px] md:[--cell-size:56px] lg:[--cell-size:60px] ",
+        "[&_table]:rounded-xl",
+        String.raw`rtl:**:[.rdp-button_next>svg]:rotate-180`,
+        String.raw`rtl:**:[.rdp-button_previous>svg]:rotate-180`,
         className
       )}
       captionLayout={captionLayout}
@@ -41,32 +42,35 @@ function Calendar({
         ...formatters,
       }}
       classNames={{
-        root: cn("w-fit", defaultClassNames.root),
+        root: cn("w-full max-w-sm mx-auto", defaultClassNames.root),
         months: cn(
-          "flex gap-4 flex-col md:flex-row relative",
+          "flex gap-2 sm:gap-4 flex-col md:flex-row relative",
           defaultClassNames.months
         ),
-        month: cn("flex flex-col w-full gap-4", defaultClassNames.month),
+        month: cn("flex flex-col w-full gap-2 px-1 md:px-2",
+          "bg-background/20 rounded-xl pb-2 pt-2 shadow-sm",
+          defaultClassNames.month
+        ),
         nav: cn(
-          "flex items-center gap-1 w-full absolute top-0 inset-x-0 justify-between",
+          "flex items-center gap-2 w-full absolute top-0 inset-x-0 justify-between z-10",          
           defaultClassNames.nav
         ),
         button_previous: cn(
-          buttonVariants({ variant: buttonVariant }),
-          "size-(--cell-size) aria-disabled:opacity-50 p-0 select-none",
+          buttonVariants({ variant: "ghost" }),
+          "size-(--cell-size) aria-disabled:opacity-50 p-0 select-none rounded-full backdrop-blur-md bg-white/30 dark:bg-neutral-800/70 hover:bg-primary/10 transition border-border border",
           defaultClassNames.button_previous
         ),
         button_next: cn(
-          buttonVariants({ variant: buttonVariant }),
-          "size-(--cell-size) aria-disabled:opacity-50 p-0 select-none",
+          buttonVariants({ variant: "ghost" }),
+          "size-(--cell-size) aria-disabled:opacity-50 p-0 select-none rounded-full backdrop-blur-md bg-white/30 dark:bg-neutral-800/70 hover:bg-primary/10 transition border-border border",
           defaultClassNames.button_next
         ),
         month_caption: cn(
-          "flex items-center justify-center h-(--cell-size) w-full px-(--cell-size)",
+          "flex items-center justify-center h-auto w-full px-2 pb-1 gap-2",
           defaultClassNames.month_caption
         ),
         dropdowns: cn(
-          "w-full flex items-center text-sm font-medium justify-center h-(--cell-size) gap-1.5",
+          "w-full flex items-center text-sm font-semibold justify-center gap-2",
           defaultClassNames.dropdowns
         ),
         dropdown_root: cn(
@@ -74,20 +78,20 @@ function Calendar({
           defaultClassNames.dropdown_root
         ),
         dropdown: cn(
-          "absolute bg-popover inset-0 opacity-0",
+          "absolute bg-background border rounded-md shadow-lg z-20 left-0 right-0 mx-auto text-left outline-none mt-1 !opacity-100 w-full",
           defaultClassNames.dropdown
         ),
         caption_label: cn(
-          "select-none font-medium",
+          "select-none font-bold text-[1.05rem] uppercase tracking-wide text-primary",
           captionLayout === "label"
             ? "text-sm"
-            : "rounded-md pl-2 pr-1 flex items-center gap-1 text-sm h-8 [&>svg]:text-muted-foreground [&>svg]:size-3.5",
+            : "rounded-md px-2 py-1 flex items-center gap-1 text-base h-8 [&>svg]:text-primary [&>svg]:size-4 bg-primary/10 dark:bg-primary/20 border border-primary/30 shadow-sm ",
           defaultClassNames.caption_label
         ),
         table: "w-full border-collapse",
         weekdays: cn("flex", defaultClassNames.weekdays),
         weekday: cn(
-          "text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem] select-none",
+          "text-muted-foreground rounded-md flex-1 font-semibold text-[0.92rem] select-none uppercase px-0 py-1",
           defaultClassNames.weekday
         ),
         week: cn("flex w-full mt-2", defaultClassNames.week),
@@ -100,24 +104,27 @@ function Calendar({
           defaultClassNames.week_number
         ),
         day: cn(
-          "relative w-full h-full p-0 text-center [&:last-child[data-selected=true]_button]:rounded-r-md group/day aspect-square select-none",
+          "relative w-full h-full text-center aspect-square select-none px-0 py-0 group/day font-medium shadow-none border-0 outline-none transition-colors",
+          "md:text-[1.025rem] text-base",
           props.showWeekNumber
-            ? "[&:nth-child(2)[data-selected=true]_button]:rounded-l-md"
-            : "[&:first-child[data-selected=true]_button]:rounded-l-md",
+            ? "[&:nth-child(2)[data-selected=true]_button]:rounded-l-xl"
+            : "[&:first-child[data-selected=true]_button]:rounded-l-xl",
           defaultClassNames.day
         ),
         range_start: cn(
-          "rounded-l-md bg-accent",
+          "rounded-l-xl bg-gradient-to-tr from-primary to-pink-400 text-white font-extrabold shadow-xl",
           defaultClassNames.range_start
         ),
-        range_middle: cn("rounded-none", defaultClassNames.range_middle),
-        range_end: cn("rounded-r-md bg-accent", defaultClassNames.range_end),
+        range_middle: cn("rounded-none bg-primary/10 dark:bg-primary/20 text-primary", defaultClassNames.range_middle),
+        range_end: cn("rounded-r-xl bg-gradient-to-tl from-pink-500 to-indigo-600 text-white font-extrabold shadow-2xl", defaultClassNames.range_end),
         today: cn(
-          "bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none",
+          "bg-gradient-to-tr from-indigo-100 via-sky-200 to-pink-100 text-blue-700 font-bold border-2 border-primary rounded-xl scale-[1.075] relative z-10 shadow-md",
+          "dark:bg-gradient-to-tr dark:from-indigo-700 dark:via-pink-700 dark:to-sky-700 dark:text-white dark:border-white/20",
+          "after:content-[''] after:absolute after:inset-1 after:rounded-xl after:border-2 after:border-primary/60 after:opacity-10",
           defaultClassNames.today
         ),
         outside: cn(
-          "text-muted-foreground aria-selected:text-muted-foreground",
+          "text-muted-foreground/60 opacity-40 bg-gray-100 dark:bg-neutral-800 pointer-events-none",
           defaultClassNames.outside
         ),
         disabled: cn(
@@ -125,6 +132,10 @@ function Calendar({
           defaultClassNames.disabled
         ),
         hidden: cn("invisible", defaultClassNames.hidden),
+        weekend: cn(
+          "bg-rose-50 dark:bg-fuchsia-900/30 text-fuchsia-600 dark:text-fuchsia-300",
+          defaultClassNames.weekend
+        ),
         ...classNames,
       }}
       components={{
