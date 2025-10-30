@@ -756,8 +756,7 @@ export default function ProjectDetails({
 
   return (
     <div className="min-h-screen p-8">
-      <div className="flex justify-between items-center mb-8">
-                <h1 className="text-4xl font-bold flex items-center">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <Folder className="mr-4 h-8 w-8" />
           {project.name}
         </h1>

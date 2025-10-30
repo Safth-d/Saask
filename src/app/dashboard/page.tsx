@@ -142,7 +142,7 @@ export default function DashboardPage() {
   if (session) {
     return (
       <div className="min-h-screen p-8">
-              <div className="flex justify-between items-center mb-4 mt-8">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 mt-8 gap-4">
                 <h2 className="text-2xl font-semibold">Vos Projets</h2>
                 <div className="flex gap-2">
                   <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
