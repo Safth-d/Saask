@@ -11,6 +11,8 @@ import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker"
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
 
+const isWeekend = (date: Date) => date.getDay() === 0 || date.getDay() === 6
+
 function Calendar({
   className,
   classNames,
@@ -19,6 +21,8 @@ function Calendar({
   buttonVariant = "ghost",
   formatters,
   components,
+  modifiers,
+  modifiersClassNames,
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
   buttonVariant?: React.ComponentProps<typeof Button>["variant"]
@@ -40,6 +44,15 @@ function Calendar({
         formatMonthDropdown: (date) =>
           date.toLocaleString("default", { month: "short" }),
         ...formatters,
+      }}
+      modifiers={{
+        weekend: isWeekend,
+        ...modifiers,
+      }}
+      modifiersClassNames={{
+        weekend:
+          "bg-rose-50 dark:bg-fuchsia-900/30 text-fuchsia-600 dark:text-fuchsia-300",
+        ...modifiersClassNames,
       }}
       classNames={{
         root: cn("w-full max-w-sm mx-auto", defaultClassNames.root),
@@ -132,10 +145,6 @@ function Calendar({
           defaultClassNames.disabled
         ),
         hidden: cn("invisible", defaultClassNames.hidden),
-        weekend: cn(
-          "bg-rose-50 dark:bg-fuchsia-900/30 text-fuchsia-600 dark:text-fuchsia-300",
-          defaultClassNames.weekend
-        ),
         ...classNames,
       }}
       components={{
