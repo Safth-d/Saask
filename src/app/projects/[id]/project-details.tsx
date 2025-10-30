@@ -863,12 +863,11 @@ export default function ProjectDetails({
                       {newTaskDueDate ? format(newTaskDueDate, "PPP p", { locale: fr }) : <span>Choisir une date</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent side="bottom" align="start" sideOffset={8} avoidCollisions={false} className="w-auto p-0 z-[9999]" onCloseAutoFocus={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()}>
+                  <PopoverContent side="bottom" align="start" sideOffset={8} avoidCollisions={false} className="w-auto p-0 z-[100000]" onCloseAutoFocus={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()}>
                     <Calendar
                       mode="single"
                       selected={newTaskDueDate}
                       onSelect={(day) => { console.log('Create calendar onSelect', day); setNewTaskDueDate(day); }}
-                      onDayClick={(day) => { console.log('Create calendar onDayClick', day); setNewTaskDueDate(day); }}
                       initialFocus
                     />
                     <div className="p-3 border-t border-border">
@@ -890,33 +889,6 @@ export default function ProjectDetails({
                     </div>
                   </PopoverContent>
                 </Popover>
-                {isCreateDuePopoverOpen && (
-                  <div className="mt-2 border rounded-md bg-popover z-[100000] p-0">
-                    <Calendar
-                      mode="single"
-                      selected={newTaskDueDate}
-                      onSelect={(day) => { console.log('Create calendar inline onSelect', day); setNewTaskDueDate(day); }}
-                      initialFocus
-                    />
-                    <div className="p-3 border-t border-border">
-                      <input 
-                        type="time"
-                        className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
-                        value={newTaskDueDate ? format(newTaskDueDate, 'HH:mm') : ''}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (!newTaskDueDate) return;
-                          const [hours, minutes] = val.split(':').map(Number);
-                          if (!isNaN(hours) && !isNaN(minutes)) {
-                            const d = new Date(newTaskDueDate);
-                            d.setHours(hours, minutes, 0, 0);
-                            setNewTaskDueDate(d);
-                          }
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
               </div>
               <Button type="submit">Créer la tâche</Button>
             </form>
@@ -1157,7 +1129,7 @@ export default function ProjectDetails({
                                                                                                                     {editingTask?.dueDate && !isNaN(new Date(editingTask.dueDate).getTime()) ? format(new Date(editingTask.dueDate), "PPP p", { locale: fr }) : <span>Choisir une date</span>}
                                                                                                                   </Button>
                                                                                                                 </PopoverTrigger>
-                                                                                                                <PopoverContent side="bottom" align="start" sideOffset={8} avoidCollisions={false} className="w-auto p-0 z-[9999]" onCloseAutoFocus={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()}>
+                                                                                                                <PopoverContent side="bottom" align="start" sideOffset={8} avoidCollisions={false} className="w-auto p-0 z-[100000]" onCloseAutoFocus={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()}>
                                                                                                                   <Calendar
                                                                                                                     mode="single"
                                                                                                                     selected={editingTask?.dueDate ? new Date(editingTask.dueDate) : undefined}
