@@ -8,6 +8,11 @@ import { cn } from "@/lib/utils"
 function Popover({
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Root>) {
+  if (typeof window !== "undefined") {
+    // Debug: vérifier rendu et état contrôlé
+    // eslint-disable-next-line no-console
+    console.log("[Popover Root] render", { open: (props as any).open })
+  }
   return <PopoverPrimitive.Root data-slot="popover" {...props} />
 }
 
@@ -25,6 +30,10 @@ function PopoverContent({
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content> & { container?: HTMLElement }) {
   const portalContainer = container ?? (typeof document !== "undefined" ? document.body : undefined)
+  if (typeof window !== "undefined") {
+    // eslint-disable-next-line no-console
+    console.log("[Popover Content] render", { hasContainer: !!portalContainer })
+  }
   return (
     <PopoverPrimitive.Portal container={portalContainer}>
       <PopoverPrimitive.Content
