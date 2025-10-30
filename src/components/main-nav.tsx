@@ -59,7 +59,7 @@ export function MainNav() {
             {session?.user ? (
               <>
                 <span className="text-sm font-medium">
-                  Bienvenue, {session.user.name || session.user.email}!
+                  {session.user.name || session.user.email}!
                 </span>
                 <Button variant="ghost" onClick={() => signOut()} className="ml-2">
                   Se déconnecter
@@ -145,7 +145,7 @@ export function MainNav() {
                   {session?.user ? (
                     <>
                       <span className="block px-3 py-2 text-base font-semibold leading-7 text-zinc-900">
-                        Bienvenue, {session.user.name || session.user.email}!
+                        {session.user.name || session.user.email}!
                       </span>
                       <Button
                         variant="ghost"
